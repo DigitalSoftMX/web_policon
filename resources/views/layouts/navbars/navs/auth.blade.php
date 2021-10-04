@@ -10,20 +10,11 @@
             </div>
             <a class="navbar-brand d-none d-lg-block d-xl-block"
                 href="{{ route('home') }}">{{ $titlePage ?? __($titlePage) }}</a>
-            <!--div class="row"-->
-            <div class="col-sm-6">
-                <a class="navbar-brand">{{ __('Mi código:') }} &nbsp;
-                    <strong>{{ auth()->user()->username }}</strong>
-                </a>
-            </div>
             @if ($titlePage == 'dashboard')
                 <div class="col-sm-6 d-none d-lg-block d-xl-block">
                     <div class="nav-tabs-navigation alinearTab">
                         <div class="nav-tabs-wrapper">
                             <ul class="nav" data-tabs="tabs">
-                                <!--li class="nav-item">
-                                        <a class="nav-link" href="#home" data-toggle="tab">General</a>
-                                    </li-->
                                 <li class="nav-item">
                                     <a class="nav-link active" href="#updates" data-toggle="tab">Lealtad</a>
                                 </li>
@@ -41,9 +32,6 @@
                     <div class="nav-tabs-navigation alinearTab d-none d-lg-block d-xl-block">
                         <div class="nav-tabs-wrapper">
                             <ul class="nav" data-tabs="tabs">
-                                <!--li class="nav-item">
-                                                    <a class="nav-link" href="#home" data-toggle="tab">General</a>
-                                                </li-->
                                 <li class="nav-item">
                                     <a class="nav-link active" href="#updates" data-toggle="tab">Lealtad</a>
                                 </li>
@@ -74,9 +62,7 @@
                     <div class="nav-tabs-navigation alinearTab">
                         <div class="nav-tabs-wrapper">
                             <ul class="nav" data-tabs="tabs">
-                                <!--li class="nav-item">
-                                    <a class="nav-link" href="#home" data-toggle="tab">General</a>
-                                </li-->
+
                                 <li class="nav-item">
                                     <a class="nav-link active" href="#updates" data-toggle="tab">Lealtad</a>
                                 </li>
@@ -118,7 +104,7 @@
                 <li class="dropdown nav-item">
                     <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                         <div class="photo">
-                            <img src="{{ asset('white') }}/img/anime6.png" alt="{{ __('Foto de Perfil') }}">
+                            <img src="{{ asset('white') }}/img/favicon.png" alt="{{ __('Foto de Perfil') }}">
                         </div>
                         <b class="caret d-none d-lg-block d-xl-block"></b>
                         <p class="d-lg-none">{{ __('Cerrar sesión') }}</p>

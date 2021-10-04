@@ -2,10 +2,10 @@
 <div class="card">
     <div class="card-header card-header-primary">
         <h4 class="card-title">
-            <a href="{{ route('admins.index') }}" title="Regresar a la lista" class="h4">
+            <a href="{{ URL::previous() }}" title="Regresar a la lista" class="h4">
                 <i class="tim-icons icon-minimal-left"></i>
             </a>
-            {{ $message ?? __('Agregar administrador') }}
+            {{ __(($button ? 'Editar' : 'Agregar') . ' administrador') }}
         </h4>
         <p class="card-category"></p>
     </div>
@@ -63,26 +63,18 @@
         </div>
 
         <div class="row mt-3">
-            <div class="form-group{{ $errors->has('address') ? ' has-danger' : '' }} col-sm-6">
-                <label for="address">{{ __('Dirección') }}</label>
-                <input type="text" class="form-control" name="address" id="input-address"
-                    value="{{ old('address', $admin->address ?? '') }}" aria-required="true"
-                    aria-describedby="addressHelp" placeholder="Escribe la dirección" aria-required="true">
-            </div>
             <div class="form-group{{ $errors->has('email') ? ' has-danger' : '' }} col-sm-6">
                 <label for="email">{{ __('Email') }}</label>
                 <input class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"
-                    id="input-email" type="email" value="{{ old('email', $admin->email ?? '') }}" aria-required="true"
-                    aria-describedby="emailHelp" placeholder="Escribe el email del usuario" aria-required="true">
+                    id="input-email" type="email" value="{{ old('email', $admin->email ?? '') }}"
+                    aria-required="true" aria-describedby="emailHelp" placeholder="Escribe el email del usuario"
+                    aria-required="true">
                 @if ($errors->has('email'))
                     <span id="email-error" class="error text-danger" for="input-email">
                         {{ $errors->first('email') }}
                     </span>
                 @endif
             </div>
-        </div>
-
-        <div class="row mt-3">
             <div class="form-group{{ $errors->has('password') ? ' has-danger' : '' }} col-sm-6">
                 <label for="password">{{ __('Contraseña') }}</label>
                 <input class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password"
@@ -94,37 +86,40 @@
                     </span>
                 @endif
             </div>
+        </div>
+
+        <div class="row mt-3">
             <div class="form-group col-sm-6">
                 <label for="password_confirmation">{{ __('Confirmar contraseña') }}</label>
                 <input type="password" class="form-control" id="input-password_confirmation"
                     aria-describedby="passwordHelp" placeholder="Confirmar contraseña" name="password_confirmation">
             </div>
-        </div>
-
-        <div class="row mt-3">
             <div class="form-group{{ $errors->has('rol') ? ' has-danger' : '' }} col-sm-6">
                 <label for="input-rol">{{ __('Rol') }}</label>
                 <select id="input-rol" name="rol"
                     class="selectpicker show-menu-arrow{{ $errors->has('rol') ? ' is-invalid' : '' }}"
                     data-style="btn-primary" data-live-search="true" data-width="100%">
-                    <option value="">{{ __('Elija una opción') }}</option>
-                    @switch(auth()->user()->roles[0]->name)
+                    <option disabled>{{ __('Elija una opción') }}</option>
+                    @switch(auth()->user()->roles->first()->name)
                         @case('admin_master')
                             @foreach ($roles as $rol)
                                 @if (isset($admin))
-                                    <option value="{{ $rol->id }}" @if (($u = $admin->roles->first()->id) == $rol->id) selected @endif>{{ $rol->name }}</option>
+                                    <option value="{{ $rol->id }}" @if (($u = $admin->roles->first()->id) == $rol->id) selected @endif>{{ $rol->description }}
+                                    </option>
                                 @else
-                                    <option value="{{ $rol->id }}">{{ $rol->name }}</option>
+                                    <option value="{{ $rol->id }}">{{ $rol->description }}</option>
                                 @endif
                             @endforeach
                         @break
                         @case('admin_eucomb')
                             @foreach ($roles as $rol)
-                                @if ($rol->name != 'admin_master')
+                                @if ($rol->description != 'admin_master')
                                     @if (isset($admin))
-                                        <option value="{{ $rol->id }}" @if (($u = $admin->roles->first()->id) == $rol->id) selected @endif>{{ $rol->name }}</option>
+                                        <option value="{{ $rol->id }}" @if (($u = $admin->roles->first()->id) == $rol->id) selected @endif>
+                                            {{ $rol->description }}
+                                        </option>
                                     @else
-                                        <option value="{{ $rol->id }}">{{ $rol->name }}</option>
+                                        <option value="{{ $rol->id }}">{{ $rol->description }}</option>
                                     @endif
                                 @endif
                             @endforeach
@@ -132,18 +127,8 @@
                     @endswitch
                 </select>
             </div>
-            <div class="form-group{{ $errors->has('sex') ? ' has-danger' : '' }} col-sm-6">
-                <label for="input-sex">{{ __('Genero') }}</label>
-                <select id="input-sex" name="sex"
-                    class="selectpicker show-menu-arrow {{ $errors->has('sex') ? ' has-danger' : '' }}"
-                    data-style="btn-primary" data-width="100%" data-live-search="true">
-                    <option value="">{{ __('Elija una opción') }}</option>
-                    <option value="M" @if ($admin->sex ?? '' == 'M') selected @endif>{{ __('Femenino') }}</option>
-                    <option value="H" @if ($admin->sex ?? '' == 'H') selected @endif>{{ __('Masculino') }}</option>
-                </select>
-            </div>
-        </div>
 
+        </div>
         <div class="row mt-3">
             <div class="form-group{{ $errors->has('station_id') ? ' has-danger' : '' }} col-sm-6">
                 <label for="input-station_id">{{ __('Estación') }}</label>
@@ -157,7 +142,7 @@
                 </select>
             </div>
         </div>
-        <div class="card-footer ml-auto mr-auto mt-5">
+        <div class="card-footer ml-auto mr-auto mt-5 text-center">
             <button type="submit" class="btn btn-primary">{{ $button ?? 'Guardar' }}</button>
         </div>
     </div>

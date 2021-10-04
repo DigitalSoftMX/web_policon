@@ -1,7 +1,7 @@
 @extends('layouts.app', ['pageSlug' => 'Historial', 'titlePage' => __('Historial de movimientos')])
 
 @section('content')
-    <ul class="nav nav-pills nav-pills-success nav-pills-icons row" role="tablist">
+    {{-- <ul class="nav nav-pills nav-pills-success nav-pills-icons row" role="tablist">
         <li class="nav-item col-sm-6">
             <a class="nav-link active" href="#dashboard-1" role="tab" data-toggle="tab">
                 {{ __('Tickets') }}
@@ -12,19 +12,19 @@
                 {{ __('Canjes') }}
             </a>
         </li>
-    </ul>
+    </ul> --}}
     <div class="card mt-4 mb-4">
         <div class="card-body">
             <div class="row">
                 <div class="form-group col-sm-2">
                     <label class="label-control">{{ __('Fecha de inicio') }}</label>
-                    <input class="form-control datetimepicker" id="input-date-ini" name="input-date-ini" type="text"
-                        value="" placeholder="Fecha">
+                    <input class="form-control datetimepicker" id="input-date-ini" name="input-date-ini" type="text" value=""
+                        placeholder="Fecha">
                 </div>
                 <div class="form-group col-sm-2">
                     <label class="label-control">{{ __('Fecha de fin') }}</label>
-                    <input class="form-control datetimepicker" id="input-date-end" name="input-date-end" type="text"
-                        value="" placeholder="Fecha">
+                    <input class="form-control datetimepicker" id="input-date-end" name="input-date-end" type="text" value=""
+                        placeholder="Fecha">
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="folio">{{ __('Folio') }}</label>
@@ -37,7 +37,8 @@
                         aria-describedby="memnbresiaHelp" placeholder="Membresia" aria-required="true">
                 </div>
                 <div class="form-group mt-3 col-sm-2">
-                    <button id="btnHistory" type="submit" class="btn btn-success" onClick="desabilitarBoton('btnHistory')" >{{ __('Buscar') }}</button>
+                    <button id="btnHistory" type="submit" class="btn btn-success"
+                        onClick="desabilitarBoton('btnHistory')">{{ __('Buscar') }}</button>
                 </div>
             </div>
         </div>
@@ -70,7 +71,7 @@
             </div>
         </div>
 
-        <div class="tab-pane" id="schedule-1">
+        {{-- <div class="tab-pane" id="schedule-1">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -94,7 +95,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 
 @endsection
@@ -105,6 +106,54 @@
             init_calendar('input-date-ini', '01-01-2018', '07-07-2025');
             init_calendar('input-date-end', '01-01-2018', '07-07-2025');
         });
+        $("#btnHistory").click(function() {
+            $.ajax({
+                url: "{{ route('get.history') }}",
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    'start': $('#input-date-ini').val(),
+                    'end': $('#input-date-end').val(),
+                    'folio': $('#folio').val(),
+                    'membresia': $('#membresia').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    demo.showNotification('top', 'center', 'Consulta realizada correctamente.',
+                        'tim-icons icon-bell-55');
+                    console.log(response);
+                    destruir_table("datatable_1");
+                    destruir_table("datatable_2");
+                    $('#datatable_1').find('tbody').empty();
+                    // $('#datatable_2').find('tbody').empty();
+                    for (i = 0; i < response.points.length; i++) {
+                        $("#datatable_1").find('tbody').append(
+                            '<tr><td>' + response.points[i].membership + '</td><td>' + response
+                            .points[i].sale + '</td><td>' + response.points[i].points +
+                            '</td><td>' + response.points[i].liters + '</td><td>' + response.points[
+                                i].gasoline + '</td><td>' + response.points[i].station +
+                            '</td><td>' + response.points[i].date + '</td></tr>'
+                        );
+                    }
+                    /* for (i = 0; i < response.exchanges.length; i++) {
 
+                        $("#datatable_2").find('tbody').append(
+                            '<tr><td>' + response.exchanges[i].folio + '</td><td>' + response
+                            .exchanges[i].station + '</td><td>' + response.exchanges[i].membership +
+                            '</td><td>' + response.exchanges[i].points + '</td><td>' + response
+                            .exchanges[i].admin + '</td><td>' + response.exchanges[i].date +
+                            '</td></tr>'
+                        );
+                    } */
+                    iniciar_date('datatable_1');
+                    // iniciar_date('datatable_2');
+                },
+                error: function(error) {
+                    demo.showNotification('top', 'center', error, 'tim-icons icon-bell-55');
+                }
+            });
+        });
     </script>
 @endpush

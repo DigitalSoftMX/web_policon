@@ -3,7 +3,6 @@ function iniciar_date(nombre_tabla)
   table=$('#'+nombre_tabla).DataTable({
 
         responsive: true,
-        dom: 'Blfrtip',
         buttons: [
             {
                 extend: 'excelHtml5',

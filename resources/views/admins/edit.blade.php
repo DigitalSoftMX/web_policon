@@ -8,7 +8,7 @@
                     <form method="post" action="{{ route('admins.update', $admin) }}" autocomplete="off"
                         class="form-horizontal">
                         @method('patch')
-                        @include('partials._admins',[$message='Editar administrador',$button='Actualizar'])
+                        @include('partials._admins',[$button='Actualizar'])
                     </form>
                 </div>
             </div>

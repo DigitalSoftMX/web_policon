@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientRequest;
 use App\User;
 use Illuminate\Http\Request;
 use App\Web\Client;
@@ -15,7 +16,7 @@ class ClientController extends Controller
     // Metodo para buscar un grupo de clientes
     public function lookingForClients(Request $request, $view = false)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         $empty = false;
         foreach ($request->only('membership', 'name', 'lastname', 'email') as $var) {
             if ($var != null) {
@@ -28,7 +29,7 @@ class ClientController extends Controller
         $query = array();
         if ($request->membership != null) {
             $request->validate(['membership' => 'min:6']);
-            array_push($query, ['username', 'LIKE', "%$request->membership%"]);
+            array_push($query, ['membership', 'LIKE', "%$request->membership%"]);
         }
         if ($request->name != null) {
             $request->validate(['name' => 'min:2']);
@@ -71,14 +72,7 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
-        if (($user = auth()->user())->roles->first()->id == 7) {
-            $users = [];
-            foreach ($user->references as $client) {
-                array_push($users, $client->user);
-            }
-            return view('clients.index', compact('users'));
-        }
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         return view('clients.lookingforclients');
     }
 
@@ -90,22 +84,22 @@ class ClientController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         return view('clients.show', ['client_id' => $id]);
     }
     // Método para buscar los canjes del cliente
     public function points(Request $request, Client $client)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         return view('clients.points', compact('client'));
     }
     // Metodo para obtener el historial de puntos
     public function historypoints(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         $client = Client::find($request->client_id);
         $arrayPointsAdded = array();
-        $arrayPointsSubstracted = array();
+        // $arrayPointsSubstracted = array();
         if (($qrs = SalesQr::where('client_id', $client->id)->whereDate('created_at', '>=', $request->inicial)->whereDate('created_at', '<=', $request->final)->get()) != null) {
             foreach ($qrs as $pA) {
                 $data['sale'] = $pA->sale;
@@ -117,7 +111,7 @@ class ClientController extends Controller
                 array_push($arrayPointsAdded, $data);
             }
         }
-        if (($exchanges = Exchange::where([['client_id', $client->id], ['status', 14]])->whereDate('created_at', '>=', $request->inicial)->whereDate('created_at', '<=', $request->final)->get()) != null) {
+        /* if (($exchanges = Exchange::where([['client_id', $client->id], ['status', 14]])->whereDate('created_at', '>=', $request->inicial)->whereDate('created_at', '<=', $request->final)->get()) != null) {
             foreach ($exchanges as $pS) {
                 $data['exchange'] = $pS->exchange;
                 $data['station'] = $pS->station->name;
@@ -127,10 +121,10 @@ class ClientController extends Controller
                 $data['date'] = $pS->created_at->format('Y/m/d H:i:s');
                 array_push($arrayPointsSubstracted, $data);
             }
-        }
+        } */
         return response()->json([
             'pointsadded' => $arrayPointsAdded,
-            'pointsubstracted' => $arrayPointsSubstracted,
+            // 'pointsubstracted' => $arrayPointsSubstracted,
         ]);
     }
 
@@ -140,11 +134,10 @@ class ClientController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit(Request $request, User $client)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
-        $fecha_de_nacimiento = Client::where('user_id', $id)->get();
-        return view('clients.edit', ['client' => User::find($id), 'birthdate' => date("Y-m-d", strtotime($fecha_de_nacimiento[0]->birthdate))]);
+        return view('clients.edit', ['client' => $client]);
     }
 
     /**
@@ -154,19 +147,11 @@ class ClientController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ClientRequest $request, User $client)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
-
-        $user = User::find($id);
-
-        $user->client->birthdate = $request->birthdate;
-
-        $user->client->update();
-
-
         $hasPassword = $request->get('password');
-        $user->update(
+        $client->update(
             $request->merge(['password' => Hash::make($request->get('password'))])
                 ->except([$hasPassword ? '' : 'password'])
         );
@@ -175,7 +160,7 @@ class ClientController extends Controller
 
     public function search_client(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         $info_movimientos = Client::find($request->client_id);
         $deposits = $info_movimientos->deposits->whereBetween('created_at', [$request->inicial, $request->final]);
 
@@ -252,13 +237,13 @@ class ClientController extends Controller
     // Metodo para la vista de los canjes
     public function exchange(Request $request, Client $client)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         return view('clients.exchanges', compact('client'));
     }
     // Metodo para obenter historial de los canjes
     public function getexchanges(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         $client = Client::find($request->client_id);
         $process = array();
         $history = array();

@@ -29,7 +29,6 @@
                                         <th>{{ __('Teléfono') }}</th>
                                         <th>{{ __('Rol') }}</th>
                                         <th>{{ __('Estación') }}</th>
-                                        <th>{{ __('Fecha de Alta') }}</th>
                                         <th class="text-right">{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
@@ -39,15 +38,10 @@
                                                 <td>{{ $admin->first_surname }} {{ $admin->second_surname }}</td>
                                                 <td>{{ $admin->email }}</td>
                                                 <td>{{ $admin->phone }}</td>
-                                                <td>{{ $admin->roles[0]->name }}</td>
+                                                <td>{{ $admin->roles->first()->description }}</td>
                                                 <td>{{ $admin->admin->station->name ?? '-' }}</td>
-                                                <td>{{ $admin->created_at ? $admin->created_at->format('d/m/Y') : '-' }}
                                                 </td>
                                                 <td class="td-actions text-right">
-                                                    <a rel="tooltip" class="btn btn-info btn-icon btn-link"
-                                                        href="{{ route('invited.show', $admin) }}">
-                                                        <i class="tim-icons icon-zoom-split"></i>
-                                                    </a>
                                                     @if ($admin->roles[0]->id != auth()->user()->roles[0]->id)
                                                         <form action="{{ route('admins.destroy', $admin) }}"
                                                             method="post">

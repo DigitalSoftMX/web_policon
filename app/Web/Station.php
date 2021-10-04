@@ -8,7 +8,7 @@ class Station extends Model
 {
     protected $table = 'station';
 
-    protected $fillable = ['name', 'address', 'phone', 'email', 'id_empresa', 'id_type', 'number_station', 'active', 'lealtad', 'image', 'abrev'];
+    protected $fillable = ['name', 'address', 'phone', 'email', 'number_station', 'active', 'image'];
     // Conexion con las ventas
     public function sales()
     {

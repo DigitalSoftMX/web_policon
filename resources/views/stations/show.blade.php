@@ -295,20 +295,6 @@
 
                 <div class="col-lg-3 pl-0">
                     <div class="row">
-                        <div class="col-6 pr-1">
-                            <div class="card card-chart mb-2">
-                                <div class="card-body text-center">
-                                    <div class="btn btn-success btn-fab btn-icon btn-round">
-                                        <i class="tim-icons icon-single-02"></i>
-                                    </div>
-                                    <h6 class="card-subtitle mt-1 mb-2 text-muted">Despachadores</h6>
-                                    <h3 class="title mb-0">{{ count($station->dispatchers) }}</h3>
-                                </div>
-                                <button class="btn btn-success ml-0 mr-0 mt-0 mb-0" onclick="window.location='{{ route('dispatcher.index', $station) }}'">
-                                    {{ __('Ver más') }}
-                                </button>
-                            </div>
-                        </div>
                         <div class="col-6 pl-1">
                             <div class="card card-chart mb-2">
                                 <div class="card-body text-center">

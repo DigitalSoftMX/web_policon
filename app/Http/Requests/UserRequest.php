@@ -36,7 +36,7 @@ class UserRequest extends FormRequest
                 'required', 'min:3'
             ],
             'phone' => [
-                'required', 'min:10'
+                'required', 'min:10', Rule::unique((new User)->getTable())->ignore($this->route()->admin ?? null)
             ],
             'email' => [
                 'required', 'email', Rule::unique((new User)->getTable())->ignore($this->route()->admin ?? null)
@@ -45,9 +45,6 @@ class UserRequest extends FormRequest
                 $this->route()->admin ? 'required_with:password_confirmation' : 'required', 'nullable', 'confirmed', 'min:8'
             ],
             'rol' => 'required',
-            'sex' => [
-                'required'
-            ],
         ];
     }
 }

@@ -19,7 +19,7 @@
 /* navbar color */
 
 :root {
-  --blue: #1A61AB;
+  --blue: #0c449c;
   --indigo: #0d0d0e;
   --purple: #8965e0;
   --pink: #f3a4b5;
@@ -6614,14 +6614,14 @@ button.close {
 }
 
 .bg-primary {
-  background-color: #e14eca !important;
+  background-color: var(--blue) !important;
 }
 
 a.bg-primary:hover,
 a.bg-primary:focus,
 button.bg-primary:hover,
 button.bg-primary:focus {
-  background-color: #d725bb !important;
+  background-color: var(--blue) !important;
 }
 
 .bg-secondary {
@@ -10080,7 +10080,7 @@ button.bg-darker:focus {
 }
 
 .text-primary {
-  color: #e14eca !important;
+  color: var(--blue) !important;
 }
 
 a.text-primary:hover,

@@ -35,12 +35,13 @@
                                             <tbody>
                                                 @foreach ($stations as $station)
                                                     <tr>
-                                                        <td>{{ $station->abrev }} - {{ $station->name }}</td>
+                                                        <td>{{ $station->name }}</td>
                                                         <td>{{ $station->address }}</td>
                                                         <td>{{ $station->phone }}</td>
                                                         <td>{{ $station->email }}</td>
                                                         <td>{{ $station->number_station }}</td>
-                                                        <td><img src="{{ asset($station->image) }}" alt="" height="40"
+                                                        <td>
+                                                            <img src="{{ asset($station->image) }}" alt="" height="40"
                                                                 onclick="imagen_m('{{ asset($station->image) }}');"
                                                                 data-toggle="modal" data-target="#exampleModalLong"
                                                                 title="click para ampliar.">
@@ -88,6 +89,5 @@
         function imagen_m(img) {
             $("#img_mos").attr("src", img);
         }
-
     </script>
 @endpush
