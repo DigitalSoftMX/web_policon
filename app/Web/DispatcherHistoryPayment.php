@@ -16,10 +16,10 @@ class DispatcherHistoryPayment extends Model
         return $this->belongsTo(Gasoline::class);
     }
 
-    public function schedule()
+    /* public function schedule()
     {
         return $this->belongsTo(Schedule::class);
-    }
+    } */
 
     public function station()
     {
@@ -31,8 +31,8 @@ class DispatcherHistoryPayment extends Model
         return $this->belongsTo(Client::class);
     }
     // Relacion con los depachadores
-    public function dispatcher()
+    /* public function dispatcher()
     {
         return $this->belongsTo(Dispatcher::class);
-    }
+    } */
 }

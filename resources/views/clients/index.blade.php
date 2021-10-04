@@ -11,7 +11,8 @@
                             <p class="card-category"> {{ __('Aquí puedes administrar a los clientes.') }}</p>
                             @if (auth()->user()->roles->first()->id != 7)
                                 <h4 class="card-title">
-                                    <a href="{{ route('clients.index') }}" title="Regresar a la lista" class="h4">
+                                    <a href="{{ route('clients.index') }}" title="Regresar a la lista"
+                                        class="h4">
                                         <i class="tim-icons icon-minimal-left"></i>
                                     </a>
                                     {{ __('Buscar un usuario') }}
@@ -30,36 +31,34 @@
                                         <th>{{ __('Nombre') }}</th>
                                         <th>{{ __('Apellidos') }}</th>
                                         <th>{{ __('Email') }}</th>
-                                        <th>{{ __('Gasopesos') }}</th>
+                                        {{-- <th>{{ __('Gasopesos') }}</th> --}}
                                         <th>{{ __('Puntos') }}</th>
-                                        <th>{{ __('Canjes') }}</th>
+                                        {{-- <th>{{ __('Canjes') }}</th> --}}
                                         <th class="text-right">{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
                                         @foreach ($users as $user)
                                             <tr>
-                                                <td>{{ $user->username }}</td>
+                                                <td>{{ $user->membership }}</td>
                                                 <td>{{ $user->name }}</td>
-                                                <td>{{ $user->first_surname }} {{ $user->second_surname }}
+                                                <td>{{ "{$user->first_surname} {$user->second_surname}" }}
                                                 </td>
                                                 <td>{{ $user->email }}</td>
-                                                <td>
+                                                {{-- <td>
                                                     {{ $user->client ? $user->client->deposits->where('status', 4)->sum('balance') : 0 }}
-                                                </td>
+                                                </td> --}}
                                                 <td>{{ $user->client ? $user->client->points : 0 }} Pts</td>
-                                                <td>{{ $user->client ? count($user->client->exchanges) : 0 }}</td>
+                                                {{-- <td>{{ $user->client ? count($user->client->exchanges) : 0 }}</td> --}}
                                                 <td class="td-actions text-right">
                                                     <div class="row justify-content-center">
-                                                        @if (auth()->user()->roles()->first()->id != 7)
-                                                            <div class="col-sm-2 mt-0">
-                                                                <a rel="tooltip" class="btn btn-primary btn-link"
-                                                                    href="{{ route('clients.edit', $user) }}"
-                                                                    data-original-title="" title="">
-                                                                    <i class="tim-icons icon-pencil"></i>
-                                                                </a>
-                                                            </div>
-                                                        @endif
-                                                        <div class="col-sm-2 mt-0 ">
+                                                        <div class="col-sm-2 mt-0">
+                                                            <a rel="tooltip" class="btn btn-primary btn-link"
+                                                                href="{{ route('clients.edit', $user) }}"
+                                                                data-original-title="" title="">
+                                                                <i class="tim-icons icon-pencil"></i>
+                                                            </a>
+                                                        </div>
+                                                        {{-- <div class="col-sm-2 mt-0 ">
                                                             @isset($user->client)
                                                                 <a rel="tooltip" class="btn btn-success btn-link"
                                                                     href="{{ route('clients.show', $user->client) }}"
@@ -67,7 +66,7 @@
                                                                     <i class="tim-icons icon-zoom-split"></i>
                                                                 </a>
                                                             @endisset
-                                                        </div>
+                                                        </div> --}}
                                                         <div class="col-sm-2 mt-0">
                                                             @isset($user->client)
                                                                 <a rel="tooltip" class="btn btn-success btn-link"
@@ -77,7 +76,7 @@
                                                                 </a>
                                                             @endisset
                                                         </div>
-                                                        <div class="col-sm-2 mt-0">
+                                                        {{-- <div class="col-sm-2 mt-0">
                                                             @isset($user->client)
                                                                 <a rel="tooltip" class="btn btn-success btn-link"
                                                                     href="{{ route('clients.exchanges', $user->client) }}"
@@ -85,7 +84,7 @@
                                                                     <i class="tim-icons icon-notes"></i>
                                                                 </a>
                                                             @endisset
-                                                        </div>
+                                                        </div> --}}
                                                     </div>
                                                 </td>
                                             </tr>

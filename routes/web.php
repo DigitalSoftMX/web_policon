@@ -112,15 +112,9 @@ Route::group(['middleware' => 'auth'], function () {
 //rutas para los administradores
 Route::group(['middleware' => 'auth'], function () {
 	Route::resource('admins', 'Web\AdminController');
-	Route::resource('invited', 'Web\InvitedController', ['only' => ['index', 'show']]);
-	Route::get('getsales/{station}/{month}/{invited?}', 'Web\InvitedController@getSales')->name('getsales');
-	Route::get('company', 'Web\AdminController@editCompany')->name('company');
-	Route::patch('company/{company}', 'Web\AdminController@updateCompany')->name('company.update');
+	/* Route::get('company', 'Web\AdminController@editCompany')->name('company');
+	Route::patch('company/{company}', 'Web\AdminController@updateCompany')->name('company.update'); */
 	Route::post('admins/schedules', 'Web\AdminController@getSchedules')->name('admins.schedules');
-});
-// Rutas para los despachadores
-Route::group(['middleware' => 'auth'], function () {
-	Route::resource('dispatchers', 'Web\DispatcherController', ['except' => ['show']]);
 });
 
 Route::group(['middleware' => 'auth'], function () {
@@ -129,35 +123,27 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('balance/denny/{deposit}', 'Web\BalanceController@denyBalance')->name('balance.denny');
 });
 
-Route::group(['middleware' => 'auth'], function () {
+/* Route::group(['middleware' => 'auth'], function () {
 	Route::resource('user_history', 'Web\UserHistoryController');
-});
+}); */
 
 // Rutas para las estaciones
 Route::group(['middleware' => 'auth'], function () {
 	Route::resource('stations', 'Web\StationController');
 	Route::resource('stations/{station}/schedules', 'Web\ScheduleController');
 	Route::resource('stations/{station}/islands', 'Web\IslandController');
-	Route::resource('stations/{station}/dispatcher', 'Web\DispatcherController');
 	Route::resource('stations/{station}/balances', 'Web\BalanceController');
 });
 // Rutas para los vales
 Route::group(['middleware' => 'auth'], function () {
-	Route::resource('vouchers', 'Web\VoucherController', ['except' => ['show']]);
+	// Route::resource('vouchers', 'Web\VoucherController', ['except' => ['show']]);
 	Route::resource('countvouchers', 'Web\CountVoucherController', ['except' => ['index', 'edit', 'update', 'show', 'destroy']]);
-	Route::get('exchanges', 'Web\ExchangeController@index')->name('exchanges.index');
+	// Route::get('exchanges', 'Web\ExchangeController@index')->name('exchanges.index');
 	Route::post('exchanges/deliver/{exchange}', 'Web\ExchangeController@deliver')->name('exchange.deliver');
 	Route::post('exchanges/collect/{exchange}', 'Web\ExchangeController@collect')->name('exchange.collect');
 	Route::post('exchanges/history/{exchange}', 'Web\ExchangeController@history')->name('exchange.history');
 	Route::get('history', 'Web\AdminController@history');
 	Route::get('getlistpoints', 'Web\AdminController@getPoints')->name('get.history');
-});
-
-// Ruta para membresias referenciadas
-Route::group(['middleware' => 'auth'], function () {
-	Route::resource('references', 'Web\ReferenceController', ['except' => ['store']]);
-	Route::post('references/addreference/{user}/{reference}', 'Web\ReferenceController@addReference')->name('addreference');
-	Route::post('references/dropreference/{user}/{reference}', 'Web\ReferenceController@dropReference')->name('dropreference');
 });
 
 Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');

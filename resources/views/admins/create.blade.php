@@ -6,7 +6,6 @@
             <div class="row">
                 <div class="col-md-7 mx-auto d-block mt-3">
                     <form method="post" action="{{ route('admins.store') }}" autocomplete="off" class="form-horizontal">
-                        @method('post')
                         @include('partials._admins')
                     </form>
                 </div>

@@ -7,7 +7,7 @@
 
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('EUCOMB', 'EUCOMB') }}</title>
+        <title>{{ config('MOBIL', 'MOBIL') }}</title>
         <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('white') }}/img/apple-icon.png">
         <link rel="icon" type="image/png" href="{{ asset('white') }}/img/favicon.png">
@@ -40,7 +40,7 @@
                 @csrf
             </form>
         @else
-            @include('layouts.navbars.navbar')
+            {{-- @include('layouts.navbars.navbar')
             <div class="wrapper wrapper-full-page">
                 <div class="full-page {{ $contentClass ?? '' }}">
                     <div class=" container-fluid">
@@ -48,7 +48,8 @@
                     </div>
                     @include('layouts.footer')
                 </div>
-            </div>
+            </div> --}}
+            @include('layouts.page_templates.guest')
         @endauth
         <!--div class="fixed-plugin">
             <div class="dropdown show-dropdown">
@@ -243,53 +244,13 @@
                     }
                 });
             });
-            $("#btnHistory").click(function(){
-                $.ajax({
-                    url: "{{ route('get.history') }}",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        'start': $('#input-date-ini').val(),
-                        'end': $('#input-date-end').val(),
-                        'folio': $('#folio').val(),
-                        'membresia': $('#membresia').val(),
-                    },
-                    headers:{ 
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') 
-                    },
-                    success: function(response){
-                        demo.showNotification('top','center', 'Consulta realizada correctamente.', 'tim-icons icon-bell-55');
-                        console.log(response);
-                        destruir_table("datatable_1");
-                        destruir_table("datatable_2");
-                        $('#datatable_1').find('tbody').empty();
-                        $('#datatable_2').find('tbody').empty();
-                        for(i=0;i<response.points.length;i++){
-                            $("#datatable_1").find('tbody').append(
-                                '<tr><td>'+response.points[i].membership+'</td><td>'+response.points[i].sale+'</td><td>'+response.points[i].points+'</td><td>'+response.points[i].liters+'</td><td>'+response.points[i].gasoline+'</td><td>'+response.points[i].station+'</td><td>'+response.points[i].date+'</td></tr>'
-                            );
-                        }
-                        for(i=0;i<response.exchanges.length;i++){
-                            
-                            $("#datatable_2").find('tbody').append(
-                                '<tr><td>'+response.exchanges[i].folio+'</td><td>'+response.exchanges[i].station+'</td><td>'+response.exchanges[i].membership+'</td><td>'+response.exchanges[i].points+'</td><td>'+response.exchanges[i].admin+'</td><td>'+response.exchanges[i].date+'</td></tr>'
-                            );
-                        }
-                        iniciar_date('datatable_1');
-                        iniciar_date('datatable_2');
-                    },
-                    error: function(error){
-                        demo.showNotification('top','center', error, 'tim-icons icon-bell-55');
-                    }
-                });
-            });
 
             function desabilitarBoton(id){
                 document.getElementById(id).disabled = true;
                 document.getElementById(id).innerHTML="Enviando...";
                 setTimeout(function() {
                     document.getElementById(id).disabled = false;
-                    document.getElementById(id).innerHTML = "Enviar";
+                    document.getElementById(id).innerHTML = "Buscar";
                 }, 3000);
                 
             }

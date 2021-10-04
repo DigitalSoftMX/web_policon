@@ -28,12 +28,13 @@ class StationRequest extends FormRequest
         return [
             'name' => ['required', 'min:3'],
             'address' => ['required', 'min:3'],
-            'phone' => 'required',
-            'number_station' => 'required',
+            'phone' => [
+                'required', 'string', Rule::unique((new Station)->getTable())->ignore($this->route()->station ?? null)
+            ],
+            'number_station' => 'required|numeric',
             'email' => [
                 'required', 'email', Rule::unique((new Station)->getTable())->ignore($this->route()->station ?? null)
             ],
-            'abrev' => ['required', 'min:3']
         ];
     }
 }
