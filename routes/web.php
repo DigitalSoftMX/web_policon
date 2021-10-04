@@ -130,8 +130,6 @@ Route::group(['middleware' => 'auth'], function () {
 // Rutas para las estaciones
 Route::group(['middleware' => 'auth'], function () {
 	Route::resource('stations', 'Web\StationController');
-	Route::resource('stations/{station}/schedules', 'Web\ScheduleController');
-	Route::resource('stations/{station}/islands', 'Web\IslandController');
 	Route::resource('stations/{station}/balances', 'Web\BalanceController');
 });
 // Rutas para los vales
