@@ -1,5 +1,55 @@
 # Changelog
 
+## 1.5.0 (2021-08-04)
+
+*   Feature: Update `Browser` signature to take optional `$connector` as first argument and
+    to match new Socket API without nullable loop arguments.
+    (#418 and #419 by @clue)
+
+    ```php
+    // unchanged
+    $browser = new React\Http\Browser();
+
+    // deprecated
+    $browser = new React\Http\Browser(null, $connector);
+    $browser = new React\Http\Browser($loop, $connector);
+
+    // new
+    $browser = new React\Http\Browser($connector);
+    $browser = new React\Http\Browser($connector, $loop);
+    ```
+
+*   Feature: Rename `Server` to `HttpServer` to avoid class name collisions and
+    to avoid any ambiguities with regards to the new `SocketServer` API.
+    (#417 and #419 by @clue)
+
+    ```php
+    // deprecated
+    $server = new React\Http\Server($handler);
+    $server->listen(new React\Socket\Server(8080));
+
+    // new
+    $http = new React\Http\HttpServer($handler);
+    $http->listen(new React\Socket\SocketServer('127.0.0.1:8080'));
+    ```
+
+## 1.4.0 (2021-07-11)
+
+A major new feature release, see [**release announcement**](https://clue.engineering/2021/announcing-reactphp-default-loop).
+
+*   Feature: Simplify usage by supporting new [default loop](https://reactphp.org/event-loop/#loop).
+    (#410 by @clue)
+
+    ```php
+    // old (still supported)
+    $browser = new React\Http\Browser($loop);
+    $server = new React\Http\Server($loop, $handler);
+
+    // new (using default loop)
+    $browser = new React\Http\Browser();
+    $server = new React\Http\Server($handler);
+    ```
+
 ## 1.3.0 (2021-04-11)
 
 *   Feature: Support persistent connections (`Connection: keep-alive`).

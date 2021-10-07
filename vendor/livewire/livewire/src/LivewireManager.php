@@ -13,6 +13,8 @@ class LivewireManager
     protected $componentAliases = [];
     protected $queryParamsForTesting = [];
 
+    protected $shouldDisableBackButtonCache = false;
+
     protected $persistentMiddleware = [
         \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         \Laravel\Jetstream\Http\Middleware\AuthenticateSession::class,
@@ -155,7 +157,7 @@ class LivewireManager
     {
         $debug = config('app.debug');
 
-        $styles = $this->cssAssets();
+        $styles = $this->cssAssets($options);
 
         // HTML Label.
         $html = $debug ? ['<!-- Livewire Styles -->'] : [];
@@ -181,12 +183,18 @@ class LivewireManager
         return implode("\n", $html);
     }
 
-    protected function cssAssets()
+    protected function cssAssets($options = [])
     {
+        $nonce = isset($options['nonce']) ? "nonce=\"{$options['nonce']}\"" : '';
+
         return <<<HTML
-<style>
+<style {$nonce}>
     [wire\:loading], [wire\:loading\.delay], [wire\:loading\.inline-block], [wire\:loading\.inline], [wire\:loading\.block], [wire\:loading\.flex], [wire\:loading\.table], [wire\:loading\.grid] {
         display: none;
+    }
+
+    [wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short], [wire\:loading\.delay\.long], [wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest] {
+        display:none;
     }
 
     [wire\:offline] {
@@ -272,8 +280,8 @@ HTML;
         // because it will be minified in production.
         return <<<HTML
 {$assetWarning}
-<script src="{$fullAssetPath}" data-turbo-eval="false" data-turbolinks-eval="false"></script>
-<script data-turbo-eval="false" data-turbolinks-eval="false"{$nonce}>
+<script src="{$fullAssetPath}" data-turbo-eval="false" data-turbolinks-eval="false" {$nonce}></script>
+<script data-turbo-eval="false" data-turbolinks-eval="false" {$nonce}>
     {$windowLivewireCheck}
 
     window.livewire = new Livewire({$jsonEncodedOptions});
@@ -291,7 +299,7 @@ HTML;
 
     let started = false;
 
-    window.addEventListener('alpine:initializing', () => {
+    window.addEventListener('alpine:initializing', function () {
         if (! started) {
             window.livewire.start();
 
@@ -416,5 +424,28 @@ HTML;
         $this->queryParamsForTesting = $queryParams;
 
         return $this;
+    }
+
+    public function setBackButtonCache()
+    {
+        /**
+         * Reverse this boolean so that the middleware is only applied when it is disabled.
+         */
+        $this->shouldDisableBackButtonCache = ! config('livewire.back_button_cache', false);
+    }
+
+    public function disableBackButtonCache()
+    {
+        $this->shouldDisableBackButtonCache = true;
+    }
+
+    public function enableBackButtonCache()
+    {
+        $this->shouldDisableBackButtonCache = false;
+    }
+
+    public function shouldDisableBackButtonCache()
+    {
+        return $this->shouldDisableBackButtonCache;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StationRequest;
+use App\Imports\SalesImport;
 use App\Web\Station;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Web\Exchange;
 use App\Web\Ticket;
 use App\Web\SalesQr;
+use Exception;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StationController extends Controller
 {
@@ -240,5 +243,19 @@ class StationController extends Controller
         }
         $station->update(['active' => 0]);
         return redirect()->back()->withStatus('Se ha eliminado la estación');
+    }
+
+    // Subiendo ventas de la estacion por excel
+    public function uploadexcelsales(Request $request, Station $station)
+    {
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
+        request()->validate(['excel' => 'required|in:csv,xlsx,xls,ods']);
+        $file = $request->file('excel');
+        try {
+            Excel::import(new SalesImport($station), $file);
+        } catch (Exception $e) {
+            return redirect()->back()->withStatus('Algo salio mal, revise el formato excel para esta estación');
+        }
+        return redirect()->back()->withStatus('Ventas cargadas correctamente');
     }
 }

@@ -4,19 +4,25 @@
 
     <div class="tab-content text-center">
         <div class="tab-pane active" id="updates">
-            <div class="row mr-0 ml-0">
+            <div class="row mx-3">
                 <div class="card mb-3 card-stats">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="statistics">
                                     <div class="card-body pt-0 pb-0 text-left">
-                                        <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Subir excel de ventas') }}</h6>
-                                        {{-- <h3 class="title mt-0 mb-0">{{ $station->islands->count() }}</h3> --}}
-                                        {{-- <a href="{{ route('islands.index', $station) }}" class="badge badge-success mt-0 mb-0">
-                                            {{ __('Agregar') }}
-                                        </a> --}}
-                                        <input type="file" name="excel" accept=".csv">
+                                        <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Subir excel de ventas') }}
+                                        </h6>
+                                        <form id="sales" action="{{ route('uploadexcelsales', $station) }}" method="post"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <input type="file" name="excel" id="file_excel" required onfocus
+                                                accept=".csv,.xlsx,.xls,.ods">
+                                            <button type="submit" id="btnFetch"
+                                                class="spinner-button btn btn-sm btn-success">
+                                                {{ __('Cargar excel') }}
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -130,11 +136,9 @@
                     </div>
                     <div class="card-body">
                         <div class="row justify-content-center">
-
                             <div class="chart-area_3 mt-1 pl-5 pr-2 mr-5">
                                 <canvas id="CountryChart"></canvas>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -223,7 +227,6 @@
                                 </div>
                             </div>
                         </div>
-
                         {{-- <div class="col-md-3">
                             <div class="">
                                     <div class=" card-body pt-0 pb-0 text-left">
@@ -303,12 +306,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-    </div>
-    </div>
-
-
 
 
 @endsection
@@ -316,6 +314,19 @@
 @push('js')
     <script src="{{ asset('white') }}/js/plugins/chartjs.min.js"></script>
     <script>
+        $("#btnFetch").click(function() {
+            let file = document.getElementById('file_excel').value;
+            if (file) {
+                // disable button
+                $(this).prop("disabled", true);
+                // add spinner to button
+                $(this).html(
+                    'Cargando archivo...'
+                );
+                document.getElementById("sales").submit();
+            }
+        });
+
         function initDashboardPageCharts() {
 
             var meses = @json($station_show['meses_largos']);
