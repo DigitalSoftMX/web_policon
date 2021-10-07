@@ -33,7 +33,7 @@ multiple concurrent HTTP requests without blocking.
     * [SSH proxy](#ssh-proxy)
     * [Unix domain sockets](#unix-domain-sockets)
 * [Server Usage](#server-usage)
-    * [Server](#server)
+    * [HttpServer](#httpserver)
     * [listen()](#listen)
     * [Server Request](#server-request)
         * [Request parameters](#request-parameters)
@@ -87,22 +87,17 @@ Once [installed](#install), you can use the following code to access a
 HTTP webserver and send some simple HTTP GET requests:
 
 ```php
-$loop = React\EventLoop\Factory::create();
-$client = new React\Http\Browser($loop);
+$client = new React\Http\Browser();
 
 $client->get('http://www.google.com/')->then(function (Psr\Http\Message\ResponseInterface $response) {
     var_dump($response->getHeaders(), (string)$response->getBody());
 });
-
-$loop->run();
 ```
 
 This is an HTTP server which responds with `Hello World!` to every request.
 
 ```php
-$loop = React\EventLoop\Factory::create();
-
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -112,10 +107,8 @@ $server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestI
     );
 });
 
-$socket = new React\Socket\Server(8080, $loop);
-$server->listen($socket);
-
-$loop->run();
+$socket = new React\Socket\SocketServer('127.0.0.1:8080');
+$http->listen($socket);
 ```
 
 See also the [examples](examples/).
@@ -208,7 +201,7 @@ clean up any underlying resources.
 ```php
 $promise = $browser->get($url);
 
-$loop->addTimer(2.0, function () use ($promise) {
+Loop::addTimer(2.0, function () use ($promise) {
     $promise->cancel();
 });
 ```
@@ -266,9 +259,7 @@ like this:
 
 ```php
 $browser = new React\Http\Browser(
-    $loop,
     new React\Socket\Connector(
-        $loop,
         array(
             'timeout' => 5
         )
@@ -373,13 +364,12 @@ The resulting blocking code could look something like this:
 ```php
 use Clue\React\Block;
 
-$loop = React\EventLoop\Factory::create();
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 
 $promise = $browser->get('http://example.com/');
 
 try {
-    $response = Block\await($promise, $loop);
+    $response = Block\await($promise, Loop::get());
     // response successfully received
 } catch (Exception $e) {
     // an error occured while performing the request
@@ -394,7 +384,7 @@ $promises = array(
     $browser->get('http://www.example.org/'),
 );
 
-$responses = Block\awaitAll($promises, $loop);
+$responses = Block\awaitAll($promises, Loop::get());
 ```
 
 Please refer to [clue/reactphp-block](https://github.com/clue/reactphp-block#readme) for more details.
@@ -584,7 +574,7 @@ matching `Content-Length` request header like so:
 
 ```php
 $body = new React\Stream\ThroughStream();
-$loop->addTimer(1.0, function () use ($body) {
+Loop::addTimer(1.0, function () use ($body) {
     $body->end("hello world");
 });
 
@@ -610,15 +600,15 @@ protocol, such as plain HTTP and TLS-encrypted HTTPS.
 ```php
 $proxy = new Clue\React\HttpProxy\ProxyConnector(
     'http://127.0.0.1:8080',
-    new React\Socket\Connector($loop)
+    new React\Socket\Connector()
 );
 
-$connector = new React\Socket\Connector($loop, array(
+$connector = new React\Socket\Connector(array(
     'tcp' => $proxy,
     'dns' => false
 ));
 
-$browser = new React\Http\Browser($loop, $connector);
+$browser = new React\Http\Browser($connector);
 ```
 
 See also the [HTTP CONNECT proxy example](examples/11-client-http-connect-proxy.php).
@@ -637,15 +627,15 @@ only, this can technically be used to tunnel any TCP/IP-based protocol.
 ```php
 $proxy = new Clue\React\Socks\Client(
     'socks://127.0.0.1:1080',
-    new React\Socket\Connector($loop)
+    new React\Socket\Connector()
 );
 
-$connector = new React\Socket\Connector($loop, array(
+$connector = new React\Socket\Connector(array(
     'tcp' => $proxy,
     'dns' => false
 ));
 
-$browser = new React\Http\Browser($loop, $connector);
+$browser = new React\Http\Browser($connector);
 ```
 
 See also the [SOCKS proxy example](examples/12-client-socks-proxy.php).
@@ -667,14 +657,14 @@ from the outside (database behind firewall) and as such can also be used for
 plain HTTP and TLS-encrypted HTTPS.
 
 ```php
-$proxy = new Clue\React\SshProxy\SshSocksConnector('me@localhost:22', $loop);
+$proxy = new Clue\React\SshProxy\SshSocksConnector('me@localhost:22', Loop::get());
 
-$connector = new React\Socket\Connector($loop, array(
+$connector = new React\Socket\Connector(array(
     'tcp' => $proxy,
     'dns' => false
 ));
 
-$browser = new React\Http\Browser($loop, $connector);
+$browser = new React\Http\Browser($connector);
 ```
 
 See also the [SSH proxy example](examples/13-client-ssh-proxy.php).
@@ -692,10 +682,10 @@ no longer be used to establish the connection:
 ```php
 $connector = new React\Socket\FixedUriConnector(
     'unix:///var/run/docker.sock',
-    new React\Socket\UnixConnector($loop)
+    new React\Socket\UnixConnector()
 );
 
-$browser = new Browser($loop, $connector);
+$browser = new React\Http\Browser($connector);
 
 $client->get('http://localhost/info')->then(function (Psr\Http\Message\ResponseInterface $response) {
     var_dump($response->getHeaders(), (string)$response->getBody());
@@ -707,9 +697,11 @@ See also the [Unix Domain Sockets (UDS) example](examples/14-client-unix-domain-
 
 ## Server Usage
 
-### Server
+### HttpServer
 
-The `React\Http\Server` class is responsible for handling incoming connections and then
+<a id="server"></a> <!-- legacy id -->
+
+The `React\Http\HttpServer` class is responsible for handling incoming connections and then
 processing each incoming HTTP request.
 
 When a complete HTTP request has been received, it will invoke the given
@@ -718,7 +710,7 @@ the constructor and will be invoked with the respective [request](#server-reques
 object and expects a [response](#server-response) object in return:
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -737,26 +729,32 @@ Each outgoing HTTP response message is always represented by the
 [PSR-7 `ResponseInterface`](https://www.php-fig.org/psr/psr-7/#33-psrhttpmessageresponseinterface),
 see also following [response](#server-response) chapter for more details.
 
-In order to start listening for any incoming connections, the `Server` needs
+This class takes an optional `LoopInterface|null $loop` parameter that can be used to
+pass the event loop instance to use for this object. You can use a `null` value
+here in order to use the [default loop](https://github.com/reactphp/event-loop#loop).
+This value SHOULD NOT be given unless you're sure you want to explicitly use a
+given event loop instance.
+
+In order to start listening for any incoming connections, the `HttpServer` needs
 to be attached to an instance of
 [`React\Socket\ServerInterface`](https://github.com/reactphp/socket#serverinterface)
 through the [`listen()`](#listen) method as described in the following
 chapter. In its most simple form, you can attach this to a
-[`React\Socket\Server`](https://github.com/reactphp/socket#server) in order
-to start a plaintext HTTP server like this:
+[`React\Socket\SocketServer`](https://github.com/reactphp/socket#socketserver)
+in order to start a plaintext HTTP server like this:
 
 ```php
-$server = new React\Http\Server($loop, $handler);
+$http = new React\Http\HttpServer($handler);
 
-$socket = new React\Socket\Server('0.0.0.0:8080', $loop);
-$server->listen($socket);
+$socket = new React\Socket\SocketServer('0.0.0.0:8080');
+$http->listen($socket);
 ```
 
 See also the [`listen()`](#listen) method and the
 [hello world server example](examples/51-server-hello-world.php)
 for more details.
 
-By default, the `Server` buffers and parses the complete incoming HTTP
+By default, the `HttpServer` buffers and parses the complete incoming HTTP
 request in memory. It will invoke the given request handler function when the
 complete request headers and request body has been received. This means the
 [request](#server-request) object passed to your request handler function will be
@@ -809,15 +807,14 @@ limit to allow for more concurrent requests (set `memory_limit 512M` or more)
 or explicitly limit concurrency.
 
 In order to override the above buffering defaults, you can configure the
-`Server` explicitly. You can use the
+`HttpServer` explicitly. You can use the
 [`LimitConcurrentRequestsMiddleware`](#limitconcurrentrequestsmiddleware) and
 [`RequestBodyBufferMiddleware`](#requestbodybuffermiddleware) (see below)
 to explicitly configure the total number of requests that can be handled at
 once like this:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(100), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(2 * 1024 * 1024), // 2 MiB per request
@@ -842,8 +839,7 @@ also use a streaming approach where only small chunks of data have to be kept
 in memory:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     $handler
 );
@@ -858,6 +854,10 @@ have full control over consuming the incoming HTTP request body and
 concurrency settings. See also [streaming incoming request](#streaming-incoming-request)
 below for more details.
 
+> Changelog v1.5.0: This class has been renamed to `HttpServer` from the
+  previous `Server` class in order to avoid any ambiguities.
+  The previous name has been deprecated and should not be used anymore.
+
 ### listen()
 
 The `listen(React\Socket\ServerInterface $socket): void` method can be used to
@@ -868,14 +868,14 @@ is responsible for emitting the underlying streaming connections. This
 HTTP server needs to be attached to it in order to process any
 connections and pase incoming streaming data as incoming HTTP request
 messages. In its most common form, you can attach this to a
-[`React\Socket\Server`](https://github.com/reactphp/socket#server) in
-order to start a plaintext HTTP server like this:
+[`React\Socket\SocketServer`](https://github.com/reactphp/socket#socketserver)
+in order to start a plaintext HTTP server like this:
 
 ```php
-$server = new React\Http\Server($loop, $handler);
+$http = new React\Http\HttpServer($handler);
 
-$socket = new React\Socket\Server('0.0.0.0:8080', $loop);
-$server->listen($socket);
+$socket = new React\Socket\SocketServer('0.0.0.0:8080');
+$http->listen($socket);
 ```
 
 See also [hello world server example](examples/51-server-hello-world.php)
@@ -893,17 +893,19 @@ Likewise, it's usually recommended to use a reverse proxy setup to accept
 secure HTTPS requests on default HTTPS port `443` (TLS termination) and
 only route plaintext requests to this HTTP server. As an alternative, you
 can also accept secure HTTPS requests with this HTTP server by attaching
-this to a [`React\Socket\Server`](https://github.com/reactphp/socket#server)
+this to a [`React\Socket\SocketServer`](https://github.com/reactphp/socket#socketserver)
 using a secure TLS listen address, a certificate file and optional
 `passphrase` like this:
 
 ```php
-$server = new React\Http\Server($loop, $handler);
+$http = new React\Http\HttpServer($handler);
 
-$socket = new React\Socket\Server('tls://0.0.0.0:8443', $loop, array(
-    'local_cert' => __DIR__ . '/localhost.pem'
+$socket = new React\Socket\SocketServer('tls://0.0.0.0:8443', array(
+    'tls' => array(
+        'local_cert' => __DIR__ . '/localhost.pem'
+    )
 ));
-$server->listen($socket);
+$http->listen($socket);
 ```
 
 See also [hello world HTTPS example](examples/61-server-hello-world-https.php)
@@ -911,7 +913,7 @@ for more details.
 
 ### Server Request
 
-As seen above, the [`Server`](#server) class is responsible for handling
+As seen above, the [`HttpServer`](#httpserver) class is responsible for handling
 incoming connections and then processing each incoming HTTP request.
 
 The request object will be processed once the request has
@@ -923,7 +925,7 @@ which in turn extends the
 and will be passed to the callback function like this.
 
  ```php 
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $body = "The method of the request is: " . $request->getMethod();
     $body .= "The requested path is: " . $request->getUri()->getPath();
 
@@ -966,7 +968,7 @@ The following parameters are currently available:
   Set to 'on' if the request used HTTPS, otherwise it won't be set
 
 ```php 
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $body = "Your IP is: " . $request->getServerParams()['REMOTE_ADDR'];
 
     return new React\Http\Message\Response(
@@ -991,7 +993,7 @@ The `getQueryParams(): array` method can be used to get the query parameters
 similiar to the `$_GET` variable.
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $queryParams = $request->getQueryParams();
 
     $body = 'The query parameter "foo" is not set. Click the following link ';
@@ -1021,7 +1023,7 @@ See also [server query parameters example](examples/54-server-query-parameter.ph
 
 #### Request body
 
-By default, the [`Server`](#server) will buffer and parse the full request body
+By default, the [`Server`](#httpserver) will buffer and parse the full request body
 in memory. This means the given request object includes the parsed request body
 and any file uploads.
 
@@ -1045,7 +1047,7 @@ By default, this method will only return parsed data for requests using
 request headers (commonly used for `POST` requests for HTML form submission data).
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $name = $request->getParsedBody()['name'] ?? 'anonymous';
 
     return new React\Http\Message\Response(
@@ -1069,7 +1071,7 @@ an XML (`Content-Type: application/xml`) request body (which is commonly used fo
 `POST`, `PUT` or `PATCH` requests in JSON-based or RESTful/RESTish APIs).
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $data = json_decode((string)$request->getBody());
     $name = $data->name ?? 'anonymous';
 
@@ -1092,7 +1094,7 @@ This array will only be filled when using the `Content-Type: multipart/form-data
 request header (commonly used for `POST` requests for HTML file uploads).
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $files = $request->getUploadedFiles();
     $name = isset($files['avatar']) ? $files['avatar']->getClientFilename() : 'nothing';
 
@@ -1116,7 +1118,7 @@ This method operates on the buffered request body, i.e. the request body size
 is always known, even when the request does not specify a `Content-Length` request
 header or when using `Transfer-Encoding: chunked` for HTTP/1.1 requests.
 
-> Note: The `Server` automatically takes care of handling requests with the
+> Note: The `HttpServer` automatically takes care of handling requests with the
   additional `Expect: 100-continue` request header. When HTTP/1.1 clients want to
   send a bigger request body, they MAY send only the request headers with an
   additional `Expect: 100-continue` request header and wait before sending the actual
@@ -1165,8 +1167,7 @@ The [ReactPHP `ReadableStreamInterface`](https://github.com/reactphp/stream#read
 gives you access to the incoming request body as the individual chunks arrive:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     function (Psr\Http\Message\ServerRequestInterface $request) {
         $body = $request->getBody();
@@ -1239,8 +1240,7 @@ This method operates on the streaming request body, i.e. the request body size
 may be unknown (`null`) when using `Transfer-Encoding: chunked` for HTTP/1.1 requests.
 
 ```php 
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     function (Psr\Http\Message\ServerRequestInterface $request) {
         $size = $request->getBody()->getSize();
@@ -1268,7 +1268,7 @@ $server = new React\Http\Server(
 );
 ```
 
-> Note: The `Server` automatically takes care of handling requests with the
+> Note: The `HttpServer` automatically takes care of handling requests with the
   additional `Expect: 100-continue` request header. When HTTP/1.1 clients want to
   send a bigger request body, they MAY send only the request headers with an
   additional `Expect: 100-continue` request header and wait before sending the actual
@@ -1313,7 +1313,7 @@ The `getCookieParams(): string[]` method can be used to
 get all cookies sent with the current request.
 
 ```php 
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $key = 'react\php';
 
     if (isset($request->getCookieParams()[$key])) {
@@ -1350,7 +1350,7 @@ See also [cookie server example](examples/55-server-cookie-handling.php) for mor
 
 #### Invalid request
 
-The `Server` class supports both HTTP/1.1 and HTTP/1.0 request messages.
+The `HttpServer` class supports both HTTP/1.1 and HTTP/1.0 request messages.
 If a client sends an invalid request message, uses an invalid HTTP
 protocol version or sends an invalid `Transfer-Encoding` request header value,
 the server will automatically send a `400` (Bad Request) HTTP error response
@@ -1359,7 +1359,7 @@ On top of this, it will emit an `error` event that can be used for logging
 purposes like this:
 
 ```php
-$server->on('error', function (Exception $e) {
+$http->on('error', function (Exception $e) {
     echo 'Error: ' . $e->getMessage() . PHP_EOL;
 });
 ```
@@ -1370,7 +1370,7 @@ valid response object from your request handler function. See also
 
 ### Server Response
 
-The callback function passed to the constructor of the [`Server`](#server) is
+The callback function passed to the constructor of the [`HttpServer`](#httpserver) is
 responsible for processing the request and returning a response, which will be
 delivered to the client.
 
@@ -1385,7 +1385,7 @@ This projects ships a [`Response` class](#response) which implements the
 In its most simple form, you can use it like this:
 
 ```php 
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -1413,9 +1413,9 @@ To prevent this you SHOULD use a
 This example shows how such a long-term action could look like:
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) use ($loop) {
-    return new Promise(function ($resolve, $reject) use ($loop) {
-        $loop->addTimer(1.5, function() use ($resolve) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
+    return new Promise(function ($resolve, $reject) {
+        Loop::addTimer(1.5, function() use ($resolve) {
             $response = new React\Http\Message\Response(
                 200,
                 array(
@@ -1451,15 +1451,15 @@ Note that other implementations of the
 may only support strings.
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) use ($loop) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $stream = new ThroughStream();
 
-    $timer = $loop->addPeriodicTimer(0.5, function () use ($stream) {
+    $timer = Loop::addPeriodicTimer(0.5, function () use ($stream) {
         $stream->write(microtime(true) . PHP_EOL);
     });
 
-    $loop->addTimer(5, function() use ($loop, $timer, $stream) {
-        $loop->cancelTimer($timer);
+    Loop::addTimer(5, function() use ($timer, $stream) {
+        Loop::cancelTimer($timer);
         $stream->end();
     });
 
@@ -1543,7 +1543,7 @@ added automatically. This is the most common use case, for example when using
 a `string` response body like this:
 
 ```php 
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -1562,10 +1562,10 @@ response messages will contain the plain response body. If you know the length
 of your streaming response body, you MAY want to specify it explicitly like this:
 
 ```php
-$server = new React\Http\Server($loop, function (Psr\Http\Message\ServerRequestInterface $request) use ($loop) {
+$http = new React\Http\HttpServer(function (Psr\Http\Message\ServerRequestInterface $request) {
     $stream = new ThroughStream();
 
-    $loop->addTimer(2.0, function () use ($stream) {
+    Loop::addTimer(2.0, function () use ($stream) {
         $stream->end("Hello World!\n");
     });
 
@@ -1606,7 +1606,7 @@ On top of this, it will emit an `error` event that can be used for logging
 purposes like this:
 
 ```php
-$server->on('error', function (Exception $e) {
+$http->on('error', function (Exception $e) {
     echo 'Error: ' . $e->getMessage() . PHP_EOL;
     if ($e->getPrevious() !== null) {
         echo 'Previous: ' . $e->getPrevious()->getMessage() . PHP_EOL;
@@ -1632,13 +1632,13 @@ create your own HTTP response message instead.
 #### Default response headers
 
 When a response is returned from the request handler function, it will be
-processed by the [`Server`](#server) and then sent back to the client.
+processed by the [`HttpServer`](#httpserver) and then sent back to the client.
 
 A `Server: ReactPHP/1` response header will be added automatically. You can add
 a custom `Server` response header like this:
 
 ```php
-$server = new React\Http\Server($loop, function (ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -1653,7 +1653,7 @@ don't want to expose the underlying server software), you can use an empty
 string value like this:
 
 ```php
-$server = new React\Http\Server($loop, function (ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -1668,7 +1668,7 @@ date and time if none is given. You can add a custom `Date` response header
 like this:
 
 ```php
-$server = new React\Http\Server($loop, function (ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -1683,7 +1683,7 @@ don't have an appropriate clock to rely on), you can use an empty string value
 like this:
 
 ```php
-$server = new React\Http\Server($loop, function (ServerRequestInterface $request) {
+$http = new React\Http\HttpServer(function (ServerRequestInterface $request) {
     return new React\Http\Message\Response(
         200,
         array(
@@ -1693,7 +1693,7 @@ $server = new React\Http\Server($loop, function (ServerRequestInterface $request
 });
 ```
 
-The `Server` class will automatically add the protocol version of the request,
+The `HttpServer` class will automatically add the protocol version of the request,
 so you don't have to. For instance, if the client sends the request using the
 HTTP/1.1 protocol version, the response message will also use the same protocol
 version, no matter what version is returned from the request handler function.
@@ -1707,7 +1707,7 @@ choice with a `Connection: close` response header.
 
 ### Middleware
 
-As documented above, the [`Server`](#server) accepts a single request handler
+As documented above, the [`HttpServer`](#httpserver) accepts a single request handler
 argument that is responsible for processing an incoming HTTP request and then
 creating and returning an outgoing HTTP response.
 
@@ -1761,13 +1761,12 @@ required to match PHP's request behavior (see below) and otherwise actively
 encourages [Third-Party Middleware](#third-party-middleware) implementations.
 
 In order to use middleware request handlers, simply pass an array with all
-callables as defined above to the [`Server`](#server).
+callables as defined above to the [`HttpServer`](#httpserver).
 The following example adds a middleware request handler that adds the current time to the request as a 
 header (`Request-Time`) and a final request handler that always returns a 200 code without a body: 
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     function (Psr\Http\Message\ServerRequestInterface $request, callable $next) {
         $request = $request->withHeader('Request-Time', time());
         return $next($request);
@@ -1791,8 +1790,7 @@ In order to simplify handling both paths, you can simply wrap this in a
 [`Promise\resolve()`](https://reactphp.org/promise/#resolve) call like this:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     function (Psr\Http\Message\ServerRequestInterface $request, callable $next) {
         $promise = React\Promise\resolve($next($request));
         return $promise->then(function (ResponseInterface $response) {
@@ -1808,14 +1806,13 @@ $server = new React\Http\Server(
 Note that the `$next` middleware request handler may also throw an
 `Exception` (or return a rejected promise) as described above.
 The previous example does not catch any exceptions and would thus signal an
-error condition to the `Server`.
+error condition to the `HttpServer`.
 Alternatively, you can also catch any `Exception` to implement custom error
 handling logic (or logging etc.) by wrapping this in a
 [`Promise`](https://reactphp.org/promise/#promise) like this:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     function (Psr\Http\Message\ServerRequestInterface $request, callable $next) {
         $promise = new React\Promise\Promise(function ($resolve) use ($next, $request) {
             $resolve($next($request));
@@ -1873,12 +1870,19 @@ feel free to add it to this list.
 
 The `React\Http\Browser` is responsible for sending HTTP requests to your HTTP server
 and keeps track of pending incoming HTTP responses.
-It also registers everything with the main [`EventLoop`](https://github.com/reactphp/event-loop#usage).
 
 ```php
-$loop = React\EventLoop\Factory::create();
+$browser = new React\Http\Browser();
+```
 
-$browser = new React\Http\Browser($loop);
+This class takes two optional arguments for more advanced usage:
+
+```php
+// constructor signature as of v1.5.0
+$browser = new React\Http\Browser(?ConnectorInterface $connector = null, ?LoopInterface $loop = null);
+
+// legacy constructor signature before v1.5.0
+$browser = new React\Http\Browser(?LoopInterface $loop = null, ?ConnectorInterface $connector = null);
 ```
 
 If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
@@ -1886,7 +1890,7 @@ proxy servers etc.), you can explicitly pass a custom instance of the
 [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface):
 
 ```php
-$connector = new React\Socket\Connector($loop, array(
+$connector = new React\Socket\Connector(array(
     'dns' => '127.0.0.1',
     'tcp' => array(
         'bindto' => '192.168.10.1:0'
@@ -1897,8 +1901,14 @@ $connector = new React\Socket\Connector($loop, array(
     )
 ));
 
-$browser = new React\Http\Browser($loop, $connector);
+$browser = new React\Http\Browser($connector);
 ```
+
+This class takes an optional `LoopInterface|null $loop` parameter that can be used to
+pass the event loop instance to use for this object. You can use a `null` value
+here in order to use the [default loop](https://github.com/reactphp/event-loop#loop).
+This value SHOULD NOT be given unless you're sure you want to explicitly use a
+given event loop instance.
 
 > Note that the browser class is final and shouldn't be extended, it is likely to be marked final in a future release.
 
@@ -1959,7 +1969,7 @@ matching `Content-Length` request header like so:
 
 ```php
 $body = new React\Stream\ThroughStream();
-$loop->addTimer(1.0, function () use ($body) {
+Loop::addTimer(1.0, function () use ($body) {
     $body->end("hello world");
 });
 
@@ -2002,7 +2012,7 @@ matching `Content-Length` request header like so:
 
 ```php
 $body = new React\Stream\ThroughStream();
-$loop->addTimer(1.0, function () use ($body) {
+Loop::addTimer(1.0, function () use ($body) {
     $body->end("hello world");
 });
 
@@ -2036,7 +2046,7 @@ matching `Content-Length` request header like so:
 
 ```php
 $body = new React\Stream\ThroughStream();
-$loop->addTimer(1.0, function () use ($body) {
+Loop::addTimer(1.0, function () use ($body) {
     $body->end("hello world");
 });
 
@@ -2084,7 +2094,7 @@ explicitly pass in a matching `Content-Length` request header like so:
 
 ```php
 $body = new React\Stream\ThroughStream();
-$loop->addTimer(1.0, function () use ($body) {
+Loop::addTimer(1.0, function () use ($body) {
     $body->end("hello world");
 });
 
@@ -2146,7 +2156,7 @@ explicitly pass in a matching `Content-Length` request header like so:
 
 ```php
 $body = new React\Stream\ThroughStream();
-$loop->addTimer(1.0, function () use ($body) {
+Loop::addTimer(1.0, function () use ($body) {
     $body->end("hello world");
 });
 
@@ -2445,7 +2455,7 @@ body in memory. Instead, it will represent the request body as a
 that emit chunks of incoming data as it is received:
 
 ```php
-$server = new React\Http\Server(array(
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     function (Psr\Http\Message\ServerRequestInterface $request) {
         $body = $request->getBody();
@@ -2466,7 +2476,7 @@ $server = new React\Http\Server(array(
             });
         });
     }
-));
+);
 ```
 
 See also [streaming incoming request](#streaming-incoming-request)
@@ -2479,17 +2489,17 @@ to explicitly configure the total number of requests that can be handled at
 once:
 
 ```php
-$server = new React\Http\Server(array(
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(100), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(2 * 1024 * 1024), // 2 MiB per request
     new React\Http\Middleware\RequestBodyParserMiddleware(),
     $handler
-));
+);
 ```
 
 > Internally, this class is used as a "marker" to not trigger the default
-  request buffering behavior in the `Server`. It does not implement any logic
+  request buffering behavior in the `HttpServer`. It does not implement any logic
   on its own.
 
 #### LimitConcurrentRequestsMiddleware
@@ -2512,8 +2522,7 @@ The following example shows how this middleware can be used to ensure no more
 than 10 handlers will be invoked at once:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(10),
     $handler
 );
@@ -2524,8 +2533,7 @@ Similarly, this middleware is often used in combination with the
 to limit the total number of requests that can be buffered at once:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(100), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(2 * 1024 * 1024), // 2 MiB per request
@@ -2539,8 +2547,7 @@ that can be buffered at once and then ensure the actual request handler only
 processes one request after another without any concurrency:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(100), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(2 * 1024 * 1024), // 2 MiB per request
@@ -2593,8 +2600,7 @@ the total number of concurrent requests.
 Usage:
 
 ```php
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(100), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(16 * 1024 * 1024), // 16 MiB
@@ -2655,8 +2661,7 @@ $handler = function (Psr\Http\Message\ServerRequestInterface $request) {
     );
 };
 
-$server = new React\Http\Server(
-    $loop,
+$http = new React\Http\HttpServer(
     new React\Http\Middleware\StreamingRequestMiddleware(),
     new React\Http\Middleware\LimitConcurrentRequestsMiddleware(100), // 100 concurrent buffering handlers
     new React\Http\Middleware\RequestBodyBufferMiddleware(16 * 1024 * 1024), // 16 MiB
@@ -2733,7 +2738,7 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require react/http:^1.3
+$ composer require react/http:^1.5
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.

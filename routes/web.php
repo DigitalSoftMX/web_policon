@@ -130,6 +130,7 @@ Route::group(['middleware' => 'auth'], function () {
 // Rutas para las estaciones
 Route::group(['middleware' => 'auth'], function () {
 	Route::resource('stations', 'Web\StationController');
+	Route::post('uploadexcelsales/{station}', 'Web\StationController@uploadexcelsales')->name('uploadexcelsales');
 	Route::resource('stations/{station}/balances', 'Web\BalanceController');
 });
 // Rutas para los vales

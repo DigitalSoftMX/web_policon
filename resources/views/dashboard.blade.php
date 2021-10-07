@@ -128,7 +128,7 @@
                 </a>
             </div>
 
-            <x-ComparativeGraphDashboard :mounts="$array_meses_largos" :stations="$stations" :chart="$dashboar" />
+            {{-- <x-ComparativeGraphDashboard :mounts="$array_meses_largos" :stations="$stations" :chart="$dashboar" /> --}}
 
 
             <div class="row">
@@ -557,60 +557,6 @@
 
 
             //graficas de pastel
-            
-            @for($p=0; $p<12; $p++)
-                var ctxGreen = document.getElementById("chartLineGreen{{$p}}").getContext("2d");
-                var data = {
-                labels:[
-                    @foreach($stations  as $key => $station)
-                        '{{ $station->abrev }}:     {{ number_format($dashboar['liters_mouths'][$p][$key],2) }} L',
-                    @endforeach
-                ],
-                datasets: [{             
-                    backgroundColor: [
-                        "#026830", "#137c29", "#20a64c","#4fae52", "#64b34f", "#93c99c","#cbe4d2", "#e4f9e8"
-                    ],
-                    borderColor: [
-                        "#026830", "#137c29", "#20a64c","#4fae52", "#64b34f", "#93c99c","#cbe4d2", "#e4f9e8"
-                    ],
-                    borderWidth: 2,
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    pointBackgroundColor: '#0b9e03',
-                    pointBorderColor: 'rgba(255,255,255,0)',
-                    pointHoverBackgroundColor: '#0b9e03',
-                    pointBorderWidth: 20,
-                    pointHoverRadius: 4,
-                    pointHoverBorderWidth: 15,
-                    pointRadius: 4,
-                    data: @json($dashboar['liters_mouths'][$p]),
-                }],
-            };
-
-            gradientChartOptionsConfigurationWithTooltipGreen.plugins = {
-      
-                doughnutlabel: {
-                    labels: [{
-                    text: '{{ number_format(array_sum($dashboar['liters_mouths'][$p]), 2)}}L',
-                    font: {
-                        size: 20,
-                        weight: 'bold'
-                    }
-                    }, {
-                    text: 'Litros vendidos'
-                    }]
-                }
-            };
-
-            var myChartp = new Chart(ctxGreen, {
-                type: 'doughnut',
-                data: data,
-                options: gradientChartOptionsConfigurationWithTooltipGreen
-            });
-            @endfor
-            
-
-
 
             var chart_labels = @json($array_meses);
             var chart_data = @json($litros_magna_meses);
@@ -649,169 +595,8 @@
                 options: gradientChartOptionsConfigurationWithTooltipPurple
             };
 
-            var myChartData = new Chart(ctx, config);
-
-            $("#0").click(function() {
-                var data = myChartData.config.data;
-                data.datasets[0].data = chart_data;
-                data.datasets[0].borderColor = '#00c907';
-                data.datasets[0].pointBackgroundColor = '#007d04';
-                data.labels = chart_labels;
-                myChartData.update();
-            });
-
-            $("#1").click(function() {
-                var chart_data = @json($litros_premium_meses);
-                var data = myChartData.config.data;
-                data.datasets[0].data = chart_data;
-                data.datasets[0].borderColor = '#e0000c';
-                data.datasets[0].pointBackgroundColor = '#fa0000';
-                data.labels = chart_labels;
-                myChartData.update();
-            });
-
-            $("#2").click(function() {
-                var chart_data = @json($litros_diesel_meses);
-                var data = myChartData.config.data;
-                data.datasets[0].data = chart_data;
-                data.datasets[0].borderColor = '#0a0a0a';
-                data.datasets[0].pointBackgroundColor = '#5c5c5c';
-                data.labels = chart_labels;
-                myChartData.update();
-            });
-
-            $("#3").click(function() {
-                var chart_data = @json($litros_total);
-                var data = myChartData.config.data;
-                data.datasets[0].data = chart_data;
-                data.datasets[0].borderColor = '#3b3b3b';
-                data.datasets[0].pointBackgroundColor = '#7d7d7d';
-                data.labels = chart_labels;
-                myChartData.update();
-            });
-
-            document.getElementById("valesTotalH4").innerHTML = "Total de vales entregados: {{ number_format(array_sum($dashboar['stations_mouths_exchage'][0]),0) }}";
-
-            var colors = ["#f81d1d", "#f81d1d", "#fa3333","#fa4d4d", "#fa6868", "#fb8282","#fca0a0", "#febcbc"];
-            var ctxL2 = document.getElementById("CountryChart").getContext("2d");
-
-            var gradientStroke = ctxL2.createLinearGradient(0, 230, 0, 50);
-
-            gradientStroke.addColorStop(1, 'rgba(248, 29, 29,1.0)');
-            gradientStroke.addColorStop(0.4, 'rgba(248, 29, 29,0.4)');
-            gradientStroke.addColorStop(0, 'rgba(248, 29, 29,0)'); 
-
-            var configL2 ={
-                type: 'bar',
-                responsive: true,
-                data: {
-                    labels:[
-                        @foreach($stations as $station)
-                            '',
-                        @endforeach
-                    ],
-                    datasets: [
-                        @foreach($stations as $key => $station)
-                        {
-                            label: '{{$station->abrev}}: {{$dashboar['stations_mouths_exchage'][0][$key]}}    ',
-                            fill: true,
-                            backgroundColor: colors[{{$key}}],
-                            hoverBackgroundColor: gradientStroke,
-                            borderColor: '#ffffff',
-                            borderWidth: 2,
-                            borderDash: [],
-                            borderDashOffset: 0.0,
-                            data: [{{$dashboar['stations_mouths_exchage'][0][$key]}}],
-                        },
-                        @endforeach   
-                    ]
-                },
-                options: gradientBarChartConfiguration
-            }
-
-            var myChartL2 = new Chart(ctxL2, configL2);
-
-            $( "#select_dash_2" ).change(function() {
-                php_variable_2 = document.getElementById("select_dash_2").value;
-                const total2 = stations_mouths_exchage[php_variable_2].reduce((a, b) => a + b);
-                document.getElementById("valesTotalH4").innerHTML = "Total de vales entregados: "+total2+"";
-                myChartL2.destroy();
-                myChartL2 = new Chart(ctxL2, {
-                type: 'bar',
-                responsive: true,
-                data: {
-                    labels:[
-                        @foreach($stations as $station)
-                            '',
-                        @endforeach
-                    ],
-                    datasets: [
-                        @foreach($stations as $key => $station)
-                        {
-                            label: '{{$station->abrev}}: '+stations_mouths_exchage[php_variable_2][{{$key}}]+'    ',
-                            fill: true,
-                            backgroundColor: colors[{{$key}}],
-                            hoverBackgroundColor: colors[{{$key}}],
-                            borderColor: '#ffffff',
-                            borderWidth: 2,
-                            borderDash: [],
-                            borderDashOffset: 0.0,
-                            data:[stations_mouths_exchage[php_variable_2][{{$key}}]],
-                        },
-                        @endforeach
-                        
-                    ]
-                },
-                options: gradientBarChartConfiguration
-                });
-            });
-
-
-
 
             /*------------- */
-            document.getElementById("ticketsTotalH4").innerHTML = "Total de tickets escaneados: {{ number_format(array_sum($dashboar['stations_mouths_tickets'][0]),0) }}";
-            var colors2 = ["#026830", "#137c29", "#20a64c","#4fae52", "#64b34f", "#93c99c","#cbe4d2", "#e4f9e8"];
-            var ctx = document.getElementById("CountryChart2").getContext("2d");
-
-            var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-            gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-            gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-            gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); 
-
-            var configL3 = {
-            type: 'bar',
-            responsive: true,
-            data: {
-                labels:[
-                    @foreach($stations as $station)
-                        '',
-                    @endforeach
-                ],
-                datasets: [
-                    @foreach($stations as $key => $station)
-                    {
-                        label: '{{$station->abrev}}: {{$dashboar['stations_mouths_tickets'][0][$key]}}    ',
-                        fill: true,
-                        backgroundColor: colors2[{{$key}}],
-                        hoverBackgroundColor: colors2[{{$key}}],
-                        borderColor: '#ffffff',
-                        borderWidth: 2,
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        data: [{{$dashboar['stations_mouths_tickets'][0][$key]}}],
-                    },
-                    @endforeach
-                    
-                ]
-            },
-            options: gradientBarChartConfiguration
-            };
-
-            var myChartL = new Chart(ctx, configL3);
-
-
             // nueva grafica
 
             
