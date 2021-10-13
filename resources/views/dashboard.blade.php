@@ -262,7 +262,7 @@
                     <div class="card">
                         <div class="card-body text-left">
                             <h6 class="card-subtitle mt-0 mb-0 text-muted">Abonos pendientes</h6>
-                            <h3 class="title mt-0 mb-0">{{$abonos_totales}}</h3>
+                            {{-- <h3 class="title mt-0 mb-0">{{$abonos_totales}}</h3> --}}
                             <a href="{{ route('balance.index') }}" class="badge badge-success mt-0 mb-0">
                                 Autorizar
                             </a>

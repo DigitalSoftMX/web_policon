@@ -26,7 +26,7 @@
     </div>
 </div>
 
-@push('dash')
+{{-- @push('dash')
     var liters_yearM = @json($chart);
     document.getElementById("ventasTotalH4").innerHTML = "LITROS TOTALES VENDIDOS: {{ number_format(array_sum($chart[0]),2) }}L";
 
@@ -78,4 +78,4 @@
         myChartDataL.update();
     });
 
-@endpush
+@endpush --}}

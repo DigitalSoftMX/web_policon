@@ -160,27 +160,38 @@ class StationController extends Controller
         }
 
         // ventas de producto
-        $total_magna = $station->sales()->where('gasoline_id', '1')->sum('liters');
+        /* $total_magna = $station->sales()->where('gasoline_id', '1')->sum('liters');
         $total_premium = $station->sales()->where('gasoline_id', '2')->sum('liters');
-        $total_diesel = $station->sales()->where('gasoline_id', '3')->sum('liters');
+        $total_diesel = $station->sales()->where('gasoline_id', '3')->sum('liters'); */
+        $total_magna = 0;
+        $total_premium = 0;
+        $total_diesel = 0;
 
 
-        $station_show['tickets'] = Ticket::where([['id_gas', $station->id], ['descrip', 'like', '%sumados%']])->count() + SalesQr::where('station_id', $station->id)->count();
-        $station_show['liters'] = Ticket::where([['id_gas', $station->id], ['descrip', 'like', '%sumados%']])->sum('litro') + SalesQr::where('station_id', $station->id)->sum('liters');
+        /* $station_show['tickets'] = Ticket::where([['id_gas', $station->id], ['descrip', 'like', '%sumados%']])->count() + SalesQr::where('station_id', $station->id)->count();
+        $station_show['liters'] = Ticket::where([['id_gas', $station->id], ['descrip', 'like', '%sumados%']])->sum('litro') + SalesQr::where('station_id', $station->id)->sum('liters'); */
+        $station_show['tickets'] = 0;
+        $station_show['liters'] = 0;
         $station_mouths_magna = [];
         $station_mouths_premium = [];
         $station_exchange_mounths_1 = [];
         $station_tickets_mounths_1 = [];
 
         for ($mes = 0; $mes <= 11; $mes++) {
-            array_push($station_mouths_magna, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'magna'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + SalesQr::where([['station_id', '=', $station->id], ['gasoline_id', '=', 1], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('liters'));
-            array_push($station_mouths_premium, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'premium'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + SalesQr::where([['station_id', '=', $station->id], ['gasoline_id', '=', 2], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('liters'));
+            /* array_push($station_mouths_magna, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'magna'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + SalesQr::where([['station_id', '=', $station->id], ['gasoline_id', '=', 1], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('liters'));
+            array_push($station_mouths_magna, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'magna'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + SalesQr::where([['station_id', '=', $station->id], ['gasoline_id', '=', 1], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('liters')); */
+            /* array_push($station_mouths_premium, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'premium'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + 0);
+            array_push($station_mouths_premium, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'premium'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + 0); */
+            array_push($station_mouths_premium, 0);
+            array_push($station_mouths_premium, 0);
         }
 
         for ($yearN = 0; $yearN < 3; $yearN++) {
             for ($mes = 0; $mes <= 11; $mes++) {
-                array_push($station_exchange_mounths_1, Exchange::where([['station_id', $station->id], ['status', 14], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count());
-                array_push($station_tickets_mounths_1, Ticket::where([['id_gas', '=', $station->id], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count() + SalesQr::where([['station_id', '=', $station->id], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count());
+                /* array_push($station_exchange_mounths_1, Exchange::where([['station_id', $station->id], ['status', 14], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count());
+                array_push($station_tickets_mounths_1, Ticket::where([['id_gas', '=', $station->id], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count() + SalesQr::where([['station_id', '=', $station->id], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count()); */
+                array_push($station_exchange_mounths_1, 0);
+                array_push($station_tickets_mounths_1, 0);
             }
         }
 

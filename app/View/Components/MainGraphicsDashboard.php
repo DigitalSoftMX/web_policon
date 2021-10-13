@@ -3,7 +3,6 @@
 namespace App\View\Components;
 
 use Illuminate\View\Component;
-use App\Web\Ticket;
 use App\Web\SalesQr;
 
 
@@ -32,7 +31,8 @@ class MainGraphicsDashboard extends Component
         $stations_year = [];
         for($ai=0; $ai<4; $ai++){
             foreach ($stations as $valor) {
-                array_push($stations_year, SalesQr::where([['station_id', $valor->id],['created_at', 'like', '%' . $year_select[$ai] . '%']])->sum('liters') + Ticket::where([['descrip', 'puntos sumados'],['descrip', 'Puntos Dobles Sumados'],['created_at', 'like', '%' . $year_select[$ai] . '%'],['id_gas', $valor->id]])->sum('litro'));
+                // array_push($stations_year, SalesQr::where([['station_id', $valor->id],['created_at', 'like', '%' . $year_select[$ai] . '%']])->sum('liters') + Ticket::where([['descrip', 'puntos sumados'],['descrip', 'Puntos Dobles Sumados'],['created_at', 'like', '%' . $year_select[$ai] . '%'],['id_gas', $valor->id]])->sum('litro'));
+                array_push($stations_year, SalesQr::where([['station_id', $valor->id],['created_at', 'like', '%' . $year_select[$ai] . '%']])->sum('liters'));
             }
         }
         $this->stations = $stations;
