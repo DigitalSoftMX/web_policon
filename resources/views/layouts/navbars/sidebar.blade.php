@@ -13,6 +13,8 @@
                             <a class="nav-link" href="{{ url($menu->ruta) }}">
                                 @if ($menu->id_role == 1)
                                     <i class="material-icons-outlined">{{ $menu->icono }}</i>
+                                @elseif($menu->id_role == 2)
+                                    <i class="fas {{ $menu->icono }}"></i>
                                 @else
                                     <i class="tim-icons {{ $menu->icono }}"></i>
                                 @endif

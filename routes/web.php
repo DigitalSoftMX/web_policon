@@ -17,9 +17,9 @@ Route::get('/', function () {
 	return view('auth.login');
 });
 
-Route::get('/graphics', function () {
+/* Route::get('/graphics', function () {
 	return view('Graphics.graphics');
-});
+}); */
 
 Route::get('/logout', function () {
 	return view('auth.login');
@@ -143,6 +143,11 @@ Route::group(['middleware' => 'auth'], function () {
 	Route::post('exchanges/history/{exchange}', 'Web\ExchangeController@history')->name('exchange.history');
 	Route::get('history', 'Web\AdminController@history');
 	Route::get('getlistpoints', 'Web\AdminController@getPoints')->name('get.history');
+});
+// Ruta clientes ganadores
+Route::group(['middleware' => 'auth'], function () {
+	Route::get('winners', 'Web\WinnerController@index')->name('winners.index');
+	Route::post('selectwinner/{client}/{station}', 'Web\WinnerController@selectWinner')->name('selectwinner');
 });
 
 Route::get('/home', 'HomeController@index')->name('home')->middleware('auth');

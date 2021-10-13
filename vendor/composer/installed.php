@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'b8f1c66d227daff97d48dfa94a21a08a93ca7cb5',
+        'reference' => 'a2240c39e48055a803349dea7e36b16c5697d687',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -131,12 +131,12 @@
             'dev_requirement' => true,
         ),
         'facade/ignition' => array(
-            'pretty_version' => '2.14.0',
-            'version' => '2.14.0.0',
+            'pretty_version' => '2.15.0',
+            'version' => '2.15.0.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../facade/ignition',
             'aliases' => array(),
-            'reference' => 'c6126e291bd44ad3fe482537a145fc70e3320598',
+            'reference' => '3ee6e94815462bcf09bca0efc1c9069685df8da3',
             'dev_requirement' => true,
         ),
         'facade/ignition-contracts' => array(
@@ -415,7 +415,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'b8f1c66d227daff97d48dfa94a21a08a93ca7cb5',
+            'reference' => 'a2240c39e48055a803349dea7e36b16c5697d687',
             'dev_requirement' => false,
         ),
         'laravel/tinker' => array(
@@ -802,8 +802,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0',
-                1 => '1.0.0 || 2.0.0 || 3.0.0',
+                0 => '1.0.0 || 2.0.0 || 3.0.0',
+                1 => '1.0|2.0',
             ),
         ),
         'psr/simple-cache' => array(
@@ -816,12 +816,12 @@
             'dev_requirement' => false,
         ),
         'psy/psysh' => array(
-            'pretty_version' => 'v0.10.8',
-            'version' => '0.10.8.0',
+            'pretty_version' => 'v0.10.9',
+            'version' => '0.10.9.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../psy/psysh',
             'aliases' => array(),
-            'reference' => 'e4573f47750dd6c92dca5aee543fa77513cbd8d3',
+            'reference' => '01281336c4ae557fe4a994544f30d3a1bc204375',
             'dev_requirement' => false,
         ),
         'pusher/pusher-php-server' => array(
@@ -843,12 +843,12 @@
             'dev_requirement' => false,
         ),
         'ramsey/collection' => array(
-            'pretty_version' => '1.2.1',
-            'version' => '1.2.1.0',
+            'pretty_version' => '1.2.2',
+            'version' => '1.2.2.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../ramsey/collection',
             'aliases' => array(),
-            'reference' => 'eaca1dc1054ddd10cbd83c1461907bee6fb528fa',
+            'reference' => 'cccc74ee5e328031b15640b51056ee8d3bb66c0a',
             'dev_requirement' => false,
         ),
         'ramsey/uuid' => array(

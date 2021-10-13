@@ -8,11 +8,16 @@ class Station extends Model
 {
     protected $table = 'station';
 
-    protected $fillable = ['name', 'address', 'phone', 'email', 'number_station', 'active', 'image'];
+    protected $fillable = ['name', 'address', 'phone', 'email', 'number_station', 'active', 'image', 'winner'];
     // Conexion con las ventas
     public function sales()
     {
         return $this->hasMany(DispatcherHistoryPayment::class);
+    }
+    // Relacion con las ventas por qr
+    public function qrs()
+    {
+        return $this->hasMany(SalesQr::class);
     }
     // Realacion con los depositos de los clientes
     public function deposits()
