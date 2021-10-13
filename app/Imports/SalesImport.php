@@ -26,6 +26,7 @@ class SalesImport implements ToCollection
             try {
                 switch ($this->station->number_station) {
                     case 6532:
+                        // Aldia Cholula
                         if (is_int($row[2])) {
                             if (is_int($row[7]) or is_double($row[7])) {
                                 $phpdate = ($row[7] - 25569) * 86400;
@@ -37,6 +38,7 @@ class SalesImport implements ToCollection
                         }
                         break;
                     case 13771:
+                        // Vanoe
                         if (is_int($row[2])) {
                             if (is_int($row[7]) or is_double($row[7])) {
                                 $phpdate = ($row[7] - 25569) * 86400;
@@ -48,6 +50,7 @@ class SalesImport implements ToCollection
                         }
                         break;
                     case 5286:
+                        // Animas
                         if (stristr($row[0], '0000000')) {
                             if (is_int($row[4]) or is_double($row[4])) {
                                 $phpdate = ($row[4] - 25569) * 86400;
@@ -59,13 +62,16 @@ class SalesImport implements ToCollection
                         }
                         break;
                     case 5391:
-                        if (is_int($row[4]) or is_double($row[4])) {
-                            $phpdate = ($row[4] - 25569) * 86400;
-                            $date = gmdate("Y-m-d H:i:s", $phpdate);
-                        } else {
-                            $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[4])->format('Y-m-d H:i:s');
+                        // Aldia Dorada
+                        if (stristr($row[0], '0000000')) {
+                            if (is_int($row[4]) or is_double($row[4])) {
+                                $phpdate = ($row[4] - 25569) * 86400;
+                                $date = gmdate("Y-m-d H:i:s", $phpdate);
+                            } else {
+                                $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[4])->format('Y-m-d H:i:s');
+                            }
+                            $this->registerAnimasDorada($row, $date);
                         }
-                        $this->registerAnimasDorada($row, $date);
                         break;
                 }
             } catch (Exception $e) {

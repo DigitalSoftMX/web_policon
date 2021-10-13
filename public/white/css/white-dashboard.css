@@ -26456,7 +26456,7 @@ div.dt-autofill-list div.dt-autofill-question input[type=number] {
 }
 
 div.dataTables_info {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.7);
 }
 
 @keyframes dtb-spinner {
