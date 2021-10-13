@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit16327930088de43ccc64485271f2bf7b
+class ComposerStaticInitf34191f545ea0debb21e6301e1f7a383
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -20,8 +20,8 @@ class ComposerStaticInit16327930088de43ccc64485271f2bf7b
         '972fda704d680a3a53c68e34e193cb22' => __DIR__ . '/..' . '/react/promise-timer/src/functions_include.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
-        'cea474b4340aa9fa53661e887a21a316' => __DIR__ . '/..' . '/react/promise-stream/src/functions_include.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
+        'cea474b4340aa9fa53661e887a21a316' => __DIR__ . '/..' . '/react/promise-stream/src/functions_include.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
@@ -93,9 +93,9 @@ class ComposerStaticInit16327930088de43ccc64485271f2bf7b
         '3109cb1a231dcd04bee1f9f620d46975' => __DIR__ . '/..' . '/paragonie/sodium_compat/autoload.php',
         'ebf8799635f67b5d7248946fe2154f4a' => __DIR__ . '/..' . '/ringcentral/psr7/src/functions_include.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
+        'ed962a97bd972bc82007176b647d4e36' => __DIR__ . '/..' . '/facade/ignition/src/helpers.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
-        'ed962a97bd972bc82007176b647d4e36' => __DIR__ . '/..' . '/facade/ignition/src/helpers.php',
         '0d8253363903f0ac7b0978dcde4e28a0' => __DIR__ . '/..' . '/beyondcode/laravel-dump-server/helpers.php',
         '40275907c8566c390185147049ef6e5d' => __DIR__ . '/..' . '/livewire/livewire/src/helpers.php',
     );
@@ -6572,10 +6572,10 @@ class ComposerStaticInit16327930088de43ccc64485271f2bf7b
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit16327930088de43ccc64485271f2bf7b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit16327930088de43ccc64485271f2bf7b::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit16327930088de43ccc64485271f2bf7b::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit16327930088de43ccc64485271f2bf7b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitf34191f545ea0debb21e6301e1f7a383::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitf34191f545ea0debb21e6301e1f7a383::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitf34191f545ea0debb21e6301e1f7a383::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitf34191f545ea0debb21e6301e1f7a383::$classMap;
 
         }, null, ClassLoader::class);
     }
