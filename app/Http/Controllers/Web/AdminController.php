@@ -41,7 +41,7 @@ class AdminController extends Controller
     public function create(Request $request)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        return view('admins.create', ['roles' => Role::where('id', '<', 4)->get(), 'stations' => Station::where('lealtad', true)->get()]);
+        return view('admins.create', ['roles' => Role::where('id', '<', 4)->get(), 'stations' => Station::where('active', true)->get()]);
     }
 
     /**
@@ -58,7 +58,7 @@ class AdminController extends Controller
         }
         $permitted_chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         while (true) {
-            $membership = substr(str_shuffle($permitted_chars), 0, 10);
+            $membership = "MO" . substr(str_shuffle($permitted_chars), 0, 7);
             if (!(User::where('membership', $membership)->exists())) {
                 $request->merge(['membership' => $membership]);
                 break;
@@ -84,7 +84,7 @@ class AdminController extends Controller
     public function edit(Request $request, User $admin)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        return view('admins.edit', ['admin' => $admin, 'roles' => Role::where('id', '<', 4)->get(), 'stations' => Station::where('lealtad', true)->get()]);
+        return view('admins.edit', ['admin' => $admin, 'roles' => Role::where('id', '<', 4)->get(), 'stations' => Station::where('active', 1)->get()]);
     }
 
     /**

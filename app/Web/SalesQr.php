@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SalesQr extends Model
 {
+    protected $fillable = ['points', 'status_id'];
     // Relacion con los clientes
     public function client()
     {
