@@ -86,7 +86,7 @@ class SalesImport implements ToCollection
                 'station_id' => $this->station->id,
                 'ticket' => $row[0],
                 'date' => $date,
-                'product' => $row[6],
+                'product' => strtoupper($row[6]),
                 'liters' => $row[7],
                 'payment' => $row[9],
                 'payment_type' => $row[11]
@@ -101,7 +101,7 @@ class SalesImport implements ToCollection
                 'station_id' => $this->station->id,
                 'ticket' => $row[2],
                 'date' => $date,
-                'product' => $row[9],
+                'product' => strtoupper($row[9]),
                 'liters' => $row[10],
                 'payment' => $row[12],
                 'payment_type' => $row[14]

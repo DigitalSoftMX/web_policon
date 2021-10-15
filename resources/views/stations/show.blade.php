@@ -22,10 +22,10 @@
                                                 class="spinner-button btn btn-sm btn-success">
                                                 {{ __('Cargar excel') }}
                                             </button>
-                                            @if ($errors->has('extension'))
+                                            @if ($errors->has('excel'))
                                                 <br>
-                                                <span id="extension-error" class="error text-danger" for="input-extension">
-                                                    {{ $errors->first('extension') }}
+                                                <span id="excel-error" class="error text-danger" for="input-excel">
+                                                    {{ $errors->first('excel') }}
                                                 </span>
                                             @endif
                                         </form>

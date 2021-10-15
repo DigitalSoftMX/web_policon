@@ -5,7 +5,7 @@
             <a href="{{ URL::previous() }}" title="Regresar a la lista" class="h4">
                 <i class="tim-icons icon-minimal-left"></i>
             </a>
-            {{ __(($button ? 'Editar' : 'Agregar') . ' administrador') }}
+            {{ __((isset($button) ? 'Editar' : 'Agregar') . ' administrador') }}
         </h4>
         <p class="card-category"></p>
     </div>
@@ -99,7 +99,7 @@
                 <select id="input-rol" name="rol"
                     class="selectpicker show-menu-arrow{{ $errors->has('rol') ? ' is-invalid' : '' }}"
                     data-style="btn-primary" data-live-search="true" data-width="100%">
-                    <option disabled>{{ __('Elija una opción') }}</option>
+                    <option disabled selected>{{ __('Elija una opción') }}</option>
                     @switch(auth()->user()->roles->first()->name)
                         @case('admin_master')
                             @foreach ($roles as $rol)
