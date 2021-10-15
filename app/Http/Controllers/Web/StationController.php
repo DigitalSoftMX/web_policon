@@ -260,7 +260,7 @@ class StationController extends Controller
     public function uploadexcelsales(Request $request, Station $station)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        request()->validate(['excel' => 'required|in:csv,xlsx,xls,ods']);
+        request()->validate(['excel' => 'required|mimes:csv,xlsx,xls,ods']);
         $file = $request->file('excel');
         try {
             Excel::import(new SalesImport($station), $file);
