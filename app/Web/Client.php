@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Client extends Model
 {
-    protected $fillable = ['active', 'winner'];
+    protected $fillable = ['active', 'winner', 'sex', 'birthdate'];
     // Relacion con el usuario
     public function user()
     {

@@ -95,7 +95,7 @@ class AdminController extends Controller
      */
     public function show(Request $request, User $admin)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
 
         // array meses en español
         $array_meses_espanol = ["Jan" => "Enero", "Feb" => "Febrero", "Mar" => "Marzo", "Apr" => "Abril", "May" => "Mayo", "Jun" => "Junio", "Jul" => "Julio", "Aug" => "Agosto", "Sep" => "Septiembre", "Oct" => "Octubre", "Nov" => "Noviembre", "Dec" => "Diciembre"];
@@ -232,7 +232,7 @@ class AdminController extends Controller
     // Método para el historial de puntos y canjes
     public function history(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
         return view('admins.history');
     }
     // Metodo para obtener el historial de puntos

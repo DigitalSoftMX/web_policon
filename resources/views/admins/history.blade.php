@@ -37,7 +37,7 @@
                         aria-describedby="memnbresiaHelp" placeholder="Membresia" aria-required="true">
                 </div>
                 <div class="form-group mt-3 col-sm-2">
-                    <button id="btnHistory" type="submit" class="btn btn-success"
+                    <button id="btnHistory" type="submit" class="btn btn-blue"
                         onClick="desabilitarBoton('btnHistory')">{{ __('Buscar') }}</button>
                 </div>
             </div>

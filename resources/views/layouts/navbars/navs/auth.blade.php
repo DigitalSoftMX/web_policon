@@ -18,9 +18,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link active" href="#updates" data-toggle="tab">Lealtad</a>
                                 </li>
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a class="nav-link" href="#history" data-toggle="tab">Prepago</a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </div>
                     </div>
@@ -35,9 +35,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link active" href="#updates" data-toggle="tab">Lealtad</a>
                                 </li>
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a class="nav-link" href="#history" data-toggle="tab">Prepago</a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </div>
                     </div>
