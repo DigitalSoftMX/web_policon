@@ -259,7 +259,7 @@ class StationController extends Controller
     // Subiendo ventas de la estacion por excel
     public function uploadexcelsales(Request $request, Station $station)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         request()->validate(['excel' => 'required|mimes:csv,xlsx,xls,ods']);
         $file = $request->file('excel');
         try {
