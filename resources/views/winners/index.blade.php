@@ -1,7 +1,19 @@
 @extends('layouts.app', ['pageSlug' => 'Elegir ganador', 'titlePage' => __('Gestión de ganadores')])
 
 @section('content')
-
+    <div class="row mb-2">
+        <div class="col-3">
+            @if ($seeWinner)
+                <a href="{{ route('finishcompetition') }}" class="btn btn-danger">
+                    {{ __('Finalizar periodo') }}
+                </a>
+            @else
+                <button class="btn btn-dark" disabled>
+                    {{ __('Finalizar periodo') }}
+                </button>
+            @endif
+        </div>
+    </div>
     <ul class="nav nav-pills nav-pills-info nav-pills-icons row" role="tablist">
         <li class="nav-item col-sm-3">
             <a class="nav-link active" href="#AldiaCholula" role="tab" data-toggle="tab">
@@ -41,33 +53,7 @@
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
-                                        @foreach ($winners['6532']['clients'] as $winner)
-                                            {{-- {{ 'bg-primary' }} --}}
-                                            <tr class="text-center">
-                                                <td>{{ $winner->user->name }}</td>
-                                                <td>{{ $winner->user->membership }}</td>
-                                                <td>{{ $winner->qrs->where('station_id', 1)->sum('points') }}</td>
-                                                <td>
-                                                    @if ($stations->where('number_station', 6532)->first()->winner)
-                                                        @if ($winner->winner)
-                                                            <button class="btn btn-sm btn-primary">
-                                                                {{ __('Entregar premio') }}
-                                                            </button>
-                                                        @else
-                                                            <button type="submit" class="btn btn-sm"
-                                                                disabled>{{ __('Elegir') }}</button>
-                                                        @endif
-                                                    @else
-                                                        <form action="{{ route('selectwinner', [$winner, 6532]) }}"
-                                                            method="post">
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="btn btn-success btn-sm">{{ __('Elegir') }}</button>
-                                                        </form>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
+
                                     </tbody>
                                 </table>
                             </div>
@@ -91,26 +77,9 @@
                                         <th>{{ __('Puntos') }}</th>
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
-                                    @foreach ($winners['5391']['clients'] as $winner)
-                                        <tr class="text-center">
-                                            <td>{{ $winner->user->name }}</td>
-                                            <td>{{ $winner->user->membership }}</td>
-                                            <td>{{ $winner->qrs->where('station_id', 2)->sum('points') }}</td>
-                                            <td>
-                                                @if ($stations->where('number_station', 5391)->first()->winner)
-                                                    <button type="submit" class="btn btn-sm"
-                                                        disabled>{{ __('Elegir') }}</button>
-                                                @else
-                                                    <form action="{{ route('selectwinner', [$winner, 5391]) }}"
-                                                        method="post">
-                                                        @csrf
-                                                        <button type="submit"
-                                                            class="btn btn-success btn-sm">{{ __('Elegir') }}</button>
-                                                    </form>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                    <tbody>
+
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -133,26 +102,7 @@
                                     <th>{{ __('Acciones') }}</th>
                                 </thead>
                                 <tbody>
-                                    @foreach ($winners['5286']['clients'] as $winner)
-                                        <tr class="text-center">
-                                            <td>{{ $winner->user->name }}</td>
-                                            <td>{{ $winner->user->membership }}</td>
-                                            <td>{{ $winner->qrs->where('station_id', 3)->sum('points') }}</td>
-                                            <td>
-                                                @if ($stations->where('number_station', 5286)->first()->winner)
-                                                    <button type="submit" class="btn btn-sm"
-                                                        disabled>{{ __('Elegir') }}</button>
-                                                @else
-                                                    <form action="{{ route('selectwinner', [$winner, 5286]) }}"
-                                                        method="post">
-                                                        @csrf
-                                                        <button type="submit"
-                                                            class="btn btn-success btn-sm">{{ __('Elegir') }}</button>
-                                                    </form>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
+
                                 </tbody>
                             </table>
                         </div>
@@ -176,22 +126,42 @@
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
-                                        @foreach ($winners['13771']['clients'] as $winner)
+                                        @foreach ($winners[$stations[1]->number_station]['clients'] as $client)
                                             <tr class="text-center">
-                                                <td>{{ $winner->user->name }}</td>
-                                                <td>{{ $winner->user->membership }}</td>
-                                                <td>{{ $winner->qrs->where('station_id', 4)->sum('points') }}</td>
                                                 <td>
-                                                    @if ($stations->where('number_station', 13771)->first()->winner)
-                                                        <button type="submit" class="btn btn-sm"
-                                                            disabled>{{ __('Elegir') }}</button>
+                                                    {{ "{$client->user->name} {$client->user->first_surname} {$client->user->second_surname}" }}
+                                                </td>
+                                                <td>{{ $client->user->membership }}</td>
+                                                <td>
+                                                    {{ $client->puntos->where('station_id', $stations[1]->id)->first()->points }}
+                                                </td>
+                                                <td>
+                                                    @if ($seeWinner)
+                                                        <a href="{{ route('clients.points', $client) }}"
+                                                            class="btn btn-blue btn-sm">{{ __('Movimientos') }}
+                                                        </a>
                                                     @else
-                                                        <form action="{{ route('selectwinner', [$winner, 13771]) }}"
-                                                            method="post">
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="btn btn-success btn-sm">{{ __('Elegir') }}</button>
-                                                        </form>
+                                                        @if ($client->winner)
+                                                            <a rel="tooltip" class="btn btn-primary btn-link"
+                                                                href="{{ route('clients.edit', $client->user) }}"
+                                                                data-original-title="" title="Ver el cliente">
+                                                                <i class="fas fa-exclamation-circle"></i>
+                                                            </a>
+                                                        @else
+                                                            @if (!$seeWinner)
+                                                                <button class="btn btn-blue btn-sm" disabled>
+                                                                    {{ __('Ganador') }}
+                                                                </button>
+                                                            @else
+                                                                <form
+                                                                    action="{{ route('selectwinner', [$client, $stations[1]->number_station]) }}"
+                                                                    method="post">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="btn btn-blue btn-sm">{{ __('Ganador') }}</button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
                                                     @endif
                                                 </td>
                                             </tr>

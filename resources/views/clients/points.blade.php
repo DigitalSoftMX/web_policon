@@ -63,6 +63,7 @@
                                 <th>{{ __('Estación') }}</th>
                                 <th>{{ __('Litros') }}</th>
                                 <th>{{ __('Puntos') }}</th>
+                                <th>{{ __('concepto') }}</th>
                                 <th>{{ __('Fecha y hora') }}</th>
                             </thead>
                             <tbody>
@@ -128,18 +129,22 @@
                     demo.showNotification('top', 'center', 'Consulta realizada correctamente.',
                         'tim-icons icon-bell-55');
                     destruir_table("datatable_1");
-                    destruir_table("datatable_2");
+                    // destruir_table("datatable_2");
                     $('#datatable_1').find('tbody').empty();
                     // $('#datatable_2').find('tbody').empty();
-                    for (i = 0; i < response.pointsadded.length; i++) {
-                        $("#datatable_1").find('tbody').append(
-                            '<tr><td>' + response.pointsadded[i].sale + '</td><td>' + response
-                            .pointsadded[i].station + '</td><td>' + response.pointsadded[i].liters +
-                            '</td><td>' + response.pointsadded[i].points + '</td><td>' + response
-                            .pointsadded[i].date +
-                            '</td></tr>'
+                    response.pointsadded.forEach(point => {
+                        let {sale, station, liters, points, concepto, date} = point;
+                        $("#datatable_1").find('tbody').append( /* html */
+                            `<tr>
+                                <td>${sale}</td>
+                                <td>${station}</td>
+                                <td>${liters}</td>
+                                <td>${points}</td>
+                                <td>${concepto}&#170 suma</td>
+                                <td>${date}</td>
+                            </tr>`
                         );
-                    }
+                    });
                     /* for (i = 0; i < response.pointsubstracted.length; i++) {
                         $("#datatable_2").find('tbody').append(
                             '<tr><td>' + response.pointsubstracted[i].exchange + '</td><td>' +

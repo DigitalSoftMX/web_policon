@@ -2,6 +2,7 @@
 
 namespace App\Web;
 
+use App\Point;
 use Illuminate\Database\Eloquent\Model;
 
 class Station extends Model
@@ -24,21 +25,6 @@ class Station extends Model
     {
         return $this->hasMany(UserHistoryDeposit::class);
     }
-    // Relacion con los despachadores
-    public function dispatchers()
-    {
-        return $this->hasMany(Dispatcher::class);
-    }
-    // relacion con los horarios
-    public function schedules()
-    {
-        return $this->hasMany(Schedule::class);
-    }
-    // Relacion con las islas y bombas
-    public function islands()
-    {
-        return $this->hasMany(Island::class);
-    }
     // Relacion con los rangos de vales
     public function ranges()
     {
@@ -53,5 +39,10 @@ class Station extends Model
     public function exchanges()
     {
         return $this->hasMany(Exchange::class);
+    }
+    // Relacion con los puntos del cliente
+    public function puntos()
+    {
+        return $this->hasMany(Point::class);
     }
 }
