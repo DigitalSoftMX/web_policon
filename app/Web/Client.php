@@ -2,12 +2,13 @@
 
 namespace App\Web;
 
+use App\Point;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Client extends Model
 {
-    protected $fillable = ['active'];
+    protected $fillable = ['active', 'winner'];
     // Relacion con el usuario
     public function user()
     {
@@ -48,5 +49,10 @@ class Client extends Model
     public function main()
     {
         return $this->belongsToMany(User::class, 'user_client');
+    }
+    // Relacion con los puntos por estacion
+    public function puntos()
+    {
+        return $this->hasMany(Point::class);
     }
 }

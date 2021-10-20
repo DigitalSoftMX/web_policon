@@ -85,7 +85,8 @@
                                 </div>
 
                                 <div class="card-footer ml-auto mr-auto mt-5">
-                                    <button type="submit" class="btn btn-primary" id="botonFormEnvio">{{ __('Buscar') }}</button>
+                                    <button type="submit" class="btn btn-primary"
+                                        id="botonFormEnvio">{{ __('Buscar') }}</button>
                                 </div>
                             </div>
                         </div>

@@ -6,15 +6,15 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-7 mx-auto d-block mt-3">
-                    <form method="post" action="{{ route('clients.update', $client) }}" autocomplete="off"
+                    <form method="post" action="{{ route('clients.update', $user) }}" autocomplete="off"
                         class="form-horizontal">
                         @csrf
                         @method('PUT')
-
                         <div class="card ">
                             <div class="card-header card-header-primary">
                                 <h4 class="card-title">
                                     <a href="{{ route('clients.index') }}" title="Buscar un usuario" class="h4"
+                                    {{-- <a href="{{ URL::previous() }}" title="Buscar un usuario" class="h4" --}}
                                         title="Buscar un usuario">
                                         <i class="tim-icons icon-minimal-left"></i>
                                     </a>
@@ -30,7 +30,7 @@
                                         <input type="text"
                                             class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
                                             id="input-name" aria-describedby="nameHelp" placeholder="Escribe un nombre"
-                                            value="{{ old('name', $client->name) }}" required="true" aria-required="true"
+                                            value="{{ old('name', $user->name) }}" required="true" aria-required="true"
                                             name="name">
                                         @if ($errors->has('name'))
                                             <span id="name-error" class="error text-danger" for="input-name">
@@ -45,7 +45,7 @@
                                         <input type="text"
                                             class="form-control{{ $errors->has('first_surname') ? ' is-invalid' : '' }}"
                                             name="first_surname" id="input-first_surname" type="text"
-                                            value="{{ old('first_surname', $client->first_surname) }}" required="true"
+                                            value="{{ old('first_surname', $user->first_surname) }}" required="true"
                                             aria-required="true" aria-describedby="first_surnameHelp"
                                             placeholder="Escribe el primer apellido" required="true" aria-required="true">
                                         @if ($errors->has('first_surname'))
@@ -64,7 +64,7 @@
                                         <input type="text"
                                             class="form-control{{ $errors->has('second_surname') ? ' is-invalid' : '' }}"
                                             name="second_surname" id="input-second_surname" type="text"
-                                            value="{{ old('second_surname', $client->second_surname) }}" required="true"
+                                            value="{{ old('second_surname', $user->second_surname) }}" required="true"
                                             aria-required="true" aria-describedby="second_surnameHelp"
                                             placeholder="Escribe el segundo apellido" required="true" aria-required="true">
                                         @if ($errors->has('second_surname'))
@@ -78,8 +78,8 @@
                                         <input type="text"
                                             class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}"
                                             id="input-phone" aria-describedby="phoneHelp" placeholder="Escribe un telefono"
-                                            value="{{ old('phone', $client->phone) }}" required="true"
-                                            aria-required="true" name="phone">
+                                            value="{{ old('phone', $user->phone) }}" required="true" aria-required="true"
+                                            name="phone">
                                         @if ($errors->has('phone'))
                                             <span id="phone-error" class="error text-danger" for="input-phone">
                                                 {{ $errors->first('phone') }}
@@ -90,14 +90,62 @@
 
                                 <div class="row mt-3">
 
+                                    <div class="form-group{{ $errors->has('address') ? ' has-danger' : '' }} col-sm-4">
+                                        <label for="address">{{ __('Dirección') }}</label>
+                                        <input type="text"
+                                            class="form-control{{ $errors->has('address') ? ' is-invalid' : '' }}"
+                                            name="address" id="input-address" type="text"
+                                            value="{{ old('address', $user->client->address) }}" required="true"
+                                            aria-required="true" aria-describedby="addressHelp"
+                                            placeholder="Escribe la dirección del usuario" required="true"
+                                            aria-required="true">
+                                        @if ($errors->has('address'))
+                                            <span id="address-error" class="error text-danger" for="input-address">
+                                                {{ $errors->first('address') }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <div class="form-group{{ $errors->has('birthdate') ? ' has-danger' : '' }} col-sm-4">
+                                        <label for="birthdate">{{ __('Fecha de nacimiento') }}</label>
+                                        <input type="birthdate"
+                                            class="form-control{{ $errors->has('birthdate') ? ' is-invalid' : '' }}"
+                                            name="birthdate" id="input-birthdate" type="text"
+                                            aria-describedby="birthdateHelp" placeholder="Escribe la fecha de nacimiento"
+                                            value="{{ old('birthdate', $user->client->birthdate) }}">
+                                        @if ($errors->has('birthdate'))
+                                            <span id="birthdate-error" class="error text-danger" for="input-birthdate">
+                                                {{ $errors->first('birthdate') }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <div class="form-group{{ $errors->has('sex') ? ' has-danger' : '' }} col-sm-4">
+                                        <label for="input-sex">{{ __('Género') }}</label>
+                                        <select id="input-sex" name="sex"
+                                            class="selectpicker show-menu-arrow{{ $errors->has('sex') ? ' is-invalid' : '' }}"
+                                            data-style="btn-primary" data-width="100%">
+                                            <option value="H" @if ($user->client->sex == 'H')selected @endif>
+                                                {{ __('H') }}
+                                            </option>
+                                            <option value="M" @if ($user->client->sex == 'M')selected @endif>
+                                                {{ __('M') }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                                <div class="row mt-3">
+
                                     <div class="form-group{{ $errors->has('email') ? ' has-danger' : '' }} col-sm-4">
                                         <label for="email">{{ __('Email') }}</label>
                                         <input type="text"
                                             class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}"
                                             name="email" id="input-email" type="text"
-                                            value="{{ old('email', $client->email) }}" required="true"
-                                            aria-required="true" aria-describedby="emailHelp"
-                                            placeholder="Escribe el email del usuario" required="true" aria-required="true">
+                                            value="{{ old('email', $user->email) }}" required="true" aria-required="true"
+                                            aria-describedby="emailHelp" placeholder="Escribe el email del usuario"
+                                            required="true" aria-required="true">
                                         @if ($errors->has('email'))
                                             <span id="email-error" class="error text-danger" for="input-email">
                                                 {{ $errors->first('email') }}

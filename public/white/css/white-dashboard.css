@@ -4901,16 +4901,16 @@ a.nav-link.active{
 @media (min-width: 576px) {
   .card-deck {
     flex-flow: row wrap;
-    margin-right: -15px;
-    margin-left: -15px;
+    /* margin-right: -15px;
+    margin-left: -15px; */
   }
   .card-deck .card {
     display: flex;
     flex: 1 0 0%;
     flex-direction: column;
-    margin-right: 15px;
+    /* margin-right: 15px; */
     margin-bottom: 0;
-    margin-left: 15px;
+    /* margin-left: 15px; */
   }
 }
 

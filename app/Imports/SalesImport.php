@@ -82,30 +82,32 @@ class SalesImport implements ToCollection
     private function registerAnimasDorada($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists())) {
-            ExcelSale::create([
-                'station_id' => $this->station->id,
-                'ticket' => $row[0],
-                'date' => $date,
-                'product' => strtoupper($row[6]),
-                'liters' => $row[7],
-                'payment' => $row[9],
-                'payment_type' => $row[11]
-            ]);
+            if ((float) $row[9] >= 500)
+                ExcelSale::create([
+                    'station_id' => $this->station->id,
+                    'ticket' => $row[0],
+                    'date' => $date,
+                    'product' => strtoupper($row[6]),
+                    'liters' => $row[7],
+                    'payment' => $row[9],
+                    'payment_type' => $row[11]
+                ]);
         }
     }
     // Regitrando informacion de la estacion Vanoe
     private function registerVanoeCholula($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[2], ['date', $date]]])->exists())) {
-            ExcelSale::create([
-                'station_id' => $this->station->id,
-                'ticket' => $row[2],
-                'date' => $date,
-                'product' => strtoupper($row[9]),
-                'liters' => $row[10],
-                'payment' => $row[12],
-                'payment_type' => $row[14]
-            ]);
+            if ((float) $row[12] >= 500)
+                ExcelSale::create([
+                    'station_id' => $this->station->id,
+                    'ticket' => $row[2],
+                    'date' => $date,
+                    'product' => strtoupper($row[9]),
+                    'liters' => $row[10],
+                    'payment' => $row[12],
+                    'payment_type' => $row[14]
+                ]);
         }
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Web\Client;
 use App\Web\Exchange;
 use App\Web\SalesQr;
+use App\Web\Station;
 use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
@@ -19,23 +20,21 @@ class ClientController extends Controller
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         $empty = false;
         foreach ($request->only('membership', 'name', 'lastname', 'email') as $var) {
-            if ($var != null) {
+            if ($var)
                 $empty = true;
-            }
         }
-        if (!$empty) {
+        if (!$empty)
             $request->validate(['empty' => 'required']);
-        }
         $query = array();
-        if ($request->membership != null) {
+        if ($request->membership) {
             $request->validate(['membership' => 'min:6']);
             array_push($query, ['membership', 'LIKE', "%$request->membership%"]);
         }
-        if ($request->name != null) {
+        if ($request->name) {
             $request->validate(['name' => 'min:2']);
             array_push($query, ['name', 'LIKE', "%$request->name%"]);
         }
-        if ($request->lastname != null) {
+        if ($request->lastname) {
             $request->validate(['lastname' => 'min:2']);
             switch (count($lastname = explode(" ", $request->lastname))) {
                 case 1:
@@ -50,18 +49,14 @@ class ClientController extends Controller
                     break;
             }
         }
-        if ($request->email != null) {
+        if ($request->email) {
             $request->validate(['email' => 'email']);
             array_push($query, ['email', 'LIKE', "%$request->email%"]);
         }
         $users = array();
         foreach (User::where($query)->get() as $user) {
-            foreach ($user->roles as $role) {
-                if ($role->id == 5) {
-                    array_push($users, $user);
-                    break;
-                }
-            }
+            if ($user->roles->first()->id == 5)
+                array_push($users, $user);
         }
         return $view ? redirect()->back()->withUsers($users) : view('clients.index', compact('users'));
     }
@@ -100,17 +95,24 @@ class ClientController extends Controller
         $client = Client::find($request->client_id);
         $arrayPointsAdded = array();
         // $arrayPointsSubstracted = array();
-        if (($qrs = SalesQr::where('client_id', $client->id)->whereDate('created_at', '>=', $request->inicial)->whereDate('created_at', '<=', $request->final)->get()) != null) {
-            foreach ($qrs as $pA) {
-                $data['sale'] = $pA->sale;
-                $data['station'] = $pA->station->name;
-                $data['liters'] = $pA->liters;
-                $data['points'] = $pA->points;
-                $data['concepto'] = 'Puntos sumados';
-                $data['date'] = $pA->created_at->format('Y/m/d H:i:s');
-                array_push($arrayPointsAdded, $data);
+        foreach (Station::where('active', 1)->get() as $station) {
+            $qrs = $station->qrs->where('client_id', $client->id)->where('active', 1)->where('created_at', '>=', $request->inicial)->where('created_at', '<=', $request->final)->sortBy('created_at');
+            if ($qrs->count() > 0) {
+                $tempDate = $qrs->first()->created_at->format('Ymd');
+                $register = 0;
+                foreach ($qrs as $qr) {
+                    $qr->created_at->format('Ymd') == $tempDate ? $register++ : $register = 1;
+                    $data['sale'] = $qr->sale;
+                    $data['station'] = $qr->station->name;
+                    $data['liters'] = $qr->liters;
+                    $data['points'] = $qr->points;
+                    $data['concepto'] = $register;
+                    $data['date'] = $qr->created_at->format('Y/m/d H:i:s');
+                    array_push($arrayPointsAdded, $data);
+                }
             }
         }
+
         /* if (($exchanges = Exchange::where([['client_id', $client->id], ['status', 14]])->whereDate('created_at', '>=', $request->inicial)->whereDate('created_at', '<=', $request->final)->get()) != null) {
             foreach ($exchanges as $pS) {
                 $data['exchange'] = $pS->exchange;
@@ -134,10 +136,10 @@ class ClientController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, User $client)
+    public function edit(Request $request, User $client, $route = false)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
-        return view('clients.edit', ['client' => $client]);
+        return view('clients.edit', ['user' => $client]);
     }
 
     /**

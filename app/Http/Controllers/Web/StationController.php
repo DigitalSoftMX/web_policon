@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StationRequest;
 use App\Imports\SalesImport;
+use App\Point;
 use App\Web\ExcelSale;
 use App\Web\Station;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use App\Web\Exchange;
-use App\Web\Ticket;
 use App\Web\SalesQr;
 use Exception;
 use Maatwebsite\Excel\Facades\Excel;
@@ -289,6 +288,12 @@ class StationController extends Controller
                 $qr->update(['points' => $points, 'status_id' => 2]);
                 $qr->client->points += $points;
                 $qr->client->save();
+                if (($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) != null) {
+                    $poinstation->points += $points;
+                    $poinstation->save();
+                } else {
+                    Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
+                }
             } else {
                 $qr->update(['status_id' => 3]);
             }
