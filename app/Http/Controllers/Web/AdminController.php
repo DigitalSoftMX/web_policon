@@ -232,15 +232,17 @@ class AdminController extends Controller
     // Método para el historial de puntos y canjes
     public function history(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        return view('admins.history');
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
+        return (auth()->user()->roles->first()->id == 3) ?
+            view('admins.history', ['station' => auth()->user()->admin->station_id]) :
+            view('admins.history');
     }
     // Metodo para obtener el historial de puntos
     public function getPoints(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         if (request('folio') != null || request('membresia') != null) {
-            $queryPoints = $this->getQuery($request, 'sale');
+            $queryPoints = $this->getQuery($request, 'sale', $request->station);
             // $queryExchange = $this->getQuery($request, 'exchange');
             if (request('start') != null && request('end') != null && request('start') <= request('end')) {
                 $points = SalesQr::where([$queryPoints])->whereDate('created_at', '>=', $request->start)->whereDate('created_at', '<=', $request->end)->with(['client.user', 'gasoline', 'station'])->get();
@@ -254,13 +256,21 @@ class AdminController extends Controller
             if (request('start') == null || request('end') == null || request('start') > request('end')) {
                 $request->merge(['start' => now()->format('Y-m-d'), 'end' => now()->format('Y-m-d')]);
             }
-            $points = SalesQr::whereDate('created_at', '>=', $request->start)->whereDate('created_at', '<=', $request->end)->with(['client.user', 'gasoline', 'station'])->get();
+            if ($request->station) {
+                $points = SalesQr::where('station_id', $request->station)->whereDate('created_at', '>=', $request->start)
+                    ->whereDate('created_at', '<=', $request->end)
+                    ->with(['client.user', 'gasoline', 'station'])->get();
+            } else {
+                $points = SalesQr::whereDate('created_at', '>=', $request->start)
+                    ->whereDate('created_at', '<=', $request->end)
+                    ->with(['client.user', 'gasoline', 'station'])->get();
+            }
             // $exchanges = Exchange::where('status', 14)->whereDate('created_at', '>=', $request->start)->whereDate('created_at', '<=', $request->end)->with(['station', 'client.user', 'admin'])->get();
             return response()->json(['points' => $this->getQRs($points)]);
         }
     }
     // Metodo para obtener un vector de consulta
-    private function getQuery($request, $type)
+    private function getQuery($request, $type, $station = null)
     {
         $query = array();
         if ($request->folio != null) {
@@ -271,6 +281,8 @@ class AdminController extends Controller
                 array_push($query, ($type == 'exchange') ? ['client_id' => $user->client->id, 'status' => 14] : ['client_id' => $user->client->id]);
             }
         }
+        if ($station)
+            array_push($query, ['station_id', $station]);
         return $query;
     }
     // Metodo para obtener los canjes
@@ -298,7 +310,7 @@ class AdminController extends Controller
             $data['sale'] = $qr->sale;
             $data['points'] = $qr->points;
             $data['liters'] = $qr->liters;
-            $data['gasoline'] = ($qr->gasoline ? $qr->gasoline->name : '');
+            $data['gasoline'] = $qr->product;
             $data['station'] = $qr->station->name;
             $data['date'] = $qr->created_at->format('Y/m/d H:i');
             array_push($qrs, $data);

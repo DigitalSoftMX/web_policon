@@ -35,11 +35,6 @@ class User extends Authenticatable
     {
         return $this->hasOne(AdminStation::class);
     }
-    // Relacion con los benefactores
-    public function hosts()
-    {
-        return $this->belongsToMany(Client::class, 'user_client');
-    }
     // Relación con los qr's por beneficio
     public function qrs()
     {
@@ -48,11 +43,6 @@ class User extends Authenticatable
     public function deposits()
     {
         return $this->hasMany(UserHistoryDeposit::class, 'reference', 'username');
-    }
-    // Relacion con los clientes para el caso de administrador ventas
-    public function references()
-    {
-        return $this->belongsToMany(Client::class, 'sale_clients', 'sale_id');
     }
     // Relacion con las ventas por QR para el caso administrador ventas
     public function salesqrs()
