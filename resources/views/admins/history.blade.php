@@ -102,21 +102,24 @@
 
 @push('js')
     <script>
+        let station = "{{ $station ?? '' }}";
         $(document).ready(function() {
             init_calendar('input-date-ini', '01-01-2018', '07-07-2025');
             init_calendar('input-date-end', '01-01-2018', '07-07-2025');
         });
         $("#btnHistory").click(function() {
+            let data = {
+                'start': $('#input-date-ini').val(),
+                'end': $('#input-date-end').val(),
+                'folio': $('#folio').val(),
+                'membresia': $('#membresia').val(),
+            };
+            station !== '' ? data.station = station : data;
             $.ajax({
                 url: "{{ route('get.history') }}",
                 type: 'GET',
                 dataType: 'json',
-                data: {
-                    'start': $('#input-date-ini').val(),
-                    'end': $('#input-date-end').val(),
-                    'folio': $('#folio').val(),
-                    'membresia': $('#membresia').val(),
-                },
+                data: data,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -128,7 +131,7 @@
                     destruir_table("datatable_2");
                     $('#datatable_1').find('tbody').empty();
                     // $('#datatable_2').find('tbody').empty();
-                    for (i = 0; i < response.points.length; i++) {
+                    /* for (i = 0; i < response.points.length; i++) {
                         $("#datatable_1").find('tbody').append(
                             '<tr><td>' + response.points[i].membership + '</td><td>' + response
                             .points[i].sale + '</td><td>' + response.points[i].points +
@@ -136,7 +139,20 @@
                                 i].gasoline + '</td><td>' + response.points[i].station +
                             '</td><td>' + response.points[i].date + '</td></tr>'
                         );
-                    }
+                    } */
+                    response.points.forEach(point => {
+                        $("#datatable_1").find('tbody').append( /* html */ `
+                            <tr>
+                                <td>${point.membership}</td>
+                                <td>${point.sale}</td>
+                                <td>${point.points}</td>
+                                <td>${point.liters}</td>
+                                <td>${point.gasoline}</td>
+                                <td>${point.station}</td>
+                                <td>${point.date}</td>
+                            </tr>
+                        `);
+                    });
                     /* for (i = 0; i < response.exchanges.length; i++) {
 
                         $("#datatable_2").find('tbody').append(

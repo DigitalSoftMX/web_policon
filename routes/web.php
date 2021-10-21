@@ -147,7 +147,7 @@ Route::group(['middleware' => 'auth'], function () {
 // Ruta clientes ganadores
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('winners', 'Web\WinnerController@index')->name('winners.index');
-	Route::get('finishcompetition','Web\WinnerController@finishCompetition')->name('finishcompetition');
+	Route::get('finishcompetition', 'Web\WinnerController@finishCompetition')->name('finishcompetition');
 	Route::post('selectwinner/{client}/{station}', 'Web\WinnerController@selectWinner')->name('selectwinner');
 });
 
