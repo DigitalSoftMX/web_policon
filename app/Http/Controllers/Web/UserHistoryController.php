@@ -16,7 +16,7 @@ class UserHistoryController extends Controller
      */
     public function index(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', ]);
         if (count($request->user()->roles) > 1) {
             return view('user_history.index', ['sales' => DispatcherHistoryPayment::all()]);
         } else {

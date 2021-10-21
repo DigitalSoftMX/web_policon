@@ -19,7 +19,7 @@
                                             <input type="file" name="excel" id="file_excel" required onfocus
                                                 accept=".csv,.xlsx,.xls,.ods">
                                             <button type="submit" id="btnFetch"
-                                                class="spinner-button btn btn-sm btn-success">
+                                                class="spinner-button btn btn-sm btn-danger">
                                                 {{ __('Cargar excel') }}
                                             </button>
                                             @if ($errors->has('excel'))
