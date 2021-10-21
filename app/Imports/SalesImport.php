@@ -32,7 +32,9 @@ class SalesImport implements ToCollection
                                 $phpdate = ($row[7] - 25569) * 86400;
                                 $date = gmdate("Y-m-d H:i:s", $phpdate);
                             } else {
-                                $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[7])->format('Y-m-d H:i:s');
+                                $date = new DateTime($row[4]);
+                                $date = $date->format('Y-m-d H:i:s');
+                                // $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[7])->format('Y-m-d H:i:s');
                             }
                             $this->registerVanoeCholula($row, $date);
                         }
@@ -44,7 +46,9 @@ class SalesImport implements ToCollection
                                 $phpdate = ($row[7] - 25569) * 86400;
                                 $date = gmdate("Y-m-d H:i:s", $phpdate);
                             } else {
-                                $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[7])->format('Y-m-d H:i:s');
+                                $date = new DateTime($row[4]);
+                                $date = $date->format('Y-m-d H:i:s');
+                                // $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[7])->format('Y-m-d H:i:s');
                             }
                             $this->registerVanoeCholula($row, $date);
                         }
@@ -56,7 +60,9 @@ class SalesImport implements ToCollection
                                 $phpdate = ($row[4] - 25569) * 86400;
                                 $date = gmdate("Y-m-d H:i:s", $phpdate);
                             } else {
-                                $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[4])->format('Y-m-d H:i:s');
+                                $date = new DateTime($row[4]);
+                                $date = $date->format('Y-m-d H:i:s');
+                                // $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[4])->format('Y-m-d H:i:s');
                             }
                             $this->registerAnimasDorada($row, $date);
                         }
@@ -68,7 +74,9 @@ class SalesImport implements ToCollection
                                 $phpdate = ($row[4] - 25569) * 86400;
                                 $date = gmdate("Y-m-d H:i:s", $phpdate);
                             } else {
-                                $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[4])->format('Y-m-d H:i:s');
+                                $date = new DateTime($row[4]);
+                                $date = $date->format('Y-m-d H:i:s');
+                                // $date = DateTime::createFromFormat('Y/m/d H:i:s', $row[4])->format('Y-m-d H:i:s');
                             }
                             $this->registerAnimasDorada($row, $date);
                         }

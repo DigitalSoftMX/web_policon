@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Eucomb\User as EucombUser;
 use App\User;
 use App\Role;
 use App\Http\Requests\UserRequest;
@@ -11,7 +10,6 @@ use App\Web\Dispatcher;
 use App\Web\Station;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -58,21 +56,6 @@ class UserController extends Controller
         }
         $user = User::create($request->merge(['password' => Hash::make($request->get('password'))])->all());
         if ($role != null || $eucomb == 2) {
-            if ($request->rol[count($request->rol) - 1] == 4) {
-                $dispatcher = new Dispatcher();
-                while (true) {
-                    $dispatcher_id = rand(10000000, 99999999);
-                    $dispatcher->dispatcher_id = 'GD-' . $dispatcher_id;
-                    if (!(Dispatcher::where('dispatcher_id', $dispatcher->dispatcher_id)->exists())) {
-                        break;
-                    }
-                }
-                $dispatcher->user_id = $user->id;
-                $dispatcher->station_id = $request->station;
-                $dispatcher->save();
-                $user->roles()->attach(Role::where('name', 'despachador')->first());
-                return redirect()->route('user.index')->withStatus(__('Despachador creado con éxito'));
-            }
             if ($request->station != null) {
                 $request->merge(['user_id' => $user->id, 'station_id' => $request->station]);
                 AdminStation::create($request->only(['user_id', 'station_id']));

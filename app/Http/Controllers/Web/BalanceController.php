@@ -19,7 +19,7 @@ class BalanceController extends Controller
      */
     public function index(Request $request, Station $station)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', ]);
         if ($station->id != null || Auth::user()->roles[0]->id == 3) {
             $station = $request->user()->station(Auth::user(), $station);
             return view('balance.index', ['payments' => $station->deposits->where('status', '!=', 4), 'station' => $station]);

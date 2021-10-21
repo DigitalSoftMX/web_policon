@@ -16,7 +16,7 @@ class ExchangeController extends Controller
      */
     public function index(Request $request)
     {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', ]);
         if (($user = Auth::user())->roles[0]->id == 3) {
             return view('exchanges.index', ['exchanges' => $user->admin->station->exchanges->where('status', '!=', 14)]);
         }

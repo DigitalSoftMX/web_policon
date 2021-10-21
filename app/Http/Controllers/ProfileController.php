@@ -20,7 +20,7 @@ class ProfileController extends Controller
         if (Auth::user()->roles[0]->id == 3) {
             return view('profile.index');
         }
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_sales']);
+        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', ]);
         return view('profile.edit');
     }
 
