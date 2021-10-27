@@ -54,7 +54,7 @@ class SalesImport implements ToCollection
                         }
                         break;
                     case 5286:
-                        // Animas
+                        // Animas   
                         if (stristr($row[0], '0000000')) {
                             if (is_int($row[4]) or is_double($row[4])) {
                                 $phpdate = ($row[4] - 25569) * 86400;
@@ -90,7 +90,7 @@ class SalesImport implements ToCollection
     private function registerAnimasDorada($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists())) {
-            if ((float) $row[9] >= 500)
+            if ((float) $row[7] >= 25)
                 ExcelSale::create([
                     'station_id' => $this->station->id,
                     'ticket' => $row[0],
@@ -106,7 +106,7 @@ class SalesImport implements ToCollection
     private function registerVanoeCholula($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[2], ['date', $date]]])->exists())) {
-            if ((float) $row[12] >= 500)
+            if ((float) $row[10] >= 25)
                 ExcelSale::create([
                     'station_id' => $this->station->id,
                     'ticket' => $row[2],
