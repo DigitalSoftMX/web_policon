@@ -267,13 +267,13 @@ class StationController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->withStatus('Algo salio mal, revise el formato excel para esta estación');
         }
-        foreach (SalesQr::where([['active', 1], ['station_id', $station->id], ['status_id', '!=', 2]])->get() as $qr) {
+        foreach (SalesQr::where([['active', 1], ['station_id', $station->id], ['status_id', 1]])->get() as $qr) {
             if (ExcelSale::where([
                 ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
                 ['product', 'like', "{$qr->product}%"], ['liters', $qr->liters], ['payment', $qr->payment],
-                ['payment_type', $qr->payment_type]
             ])->exists()) {
                 $count = SalesQr::where([['client_id', $qr->client_id], ['active', 1], ['status_id', 2], ['created_at', 'like', $qr->created_at->format('Y-m-d') . '%']])->count();
+                $continue = true;
                 switch ($qr->product) {
                     case str_contains($qr->product, 'EXTRA'):
                         $points = $this->getPoints($qr->liters, 1.5, $count);
@@ -281,18 +281,22 @@ class StationController extends Controller
                     case str_contains($qr->product, 'SUPREME'):
                         $points = $this->getPoints($qr->liters, 2, $count);
                         break;
-                    case str_contains($qr->product, 'DIESEL'):
-                        $points = $this->getPoints($qr->liters, 1, $count);
+                    default:
+                        $continue = false;
                         break;
                 }
-                $qr->update(['points' => $points, 'status_id' => 2]);
-                $qr->client->points += $points;
-                $qr->client->save();
-                if (($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) != null) {
-                    $poinstation->points += $points;
-                    $poinstation->save();
+                if ($continue) {
+                    $qr->update(['points' => $points, 'status_id' => 2]);
+                    $qr->client->points += $points;
+                    $qr->client->save();
+                    if (($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) != null) {
+                        $poinstation->points += $points;
+                        $poinstation->save();
+                    } else {
+                        Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
+                    }
                 } else {
-                    Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
+                    $qr->update(['status_id' => 3]);
                 }
             } else {
                 $qr->update(['status_id' => 3]);
