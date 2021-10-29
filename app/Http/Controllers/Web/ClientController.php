@@ -104,6 +104,7 @@ class ClientController extends Controller
                     $qr->created_at->format('Ymd') == $tempDate ? $register++ : $register = 1;
                     $data['sale'] = $qr->sale;
                     $data['station'] = $qr->station->name;
+                    $data['station_id'] = $qr->station->number_station;
                     $data['liters'] = $qr->liters;
                     $data['points'] = $qr->points;
                     $data['concepto'] = $register;
