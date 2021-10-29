@@ -2,20 +2,28 @@
 
 @section('content')
 
-    {{-- <ul class="nav nav-pills nav-pills-success nav-pills-icons row" role="tablist">
-        <li class="nav-item col-sm-6">
-            <a class="nav-link active" href="#dashboard-1" role="tab" data-toggle="tab">
-                <i class="material-icons" style="font-size: 35px">keyboard_arrow_up</i>
-                {{ __('Acumulados') }}
+    <ul class="nav nav-pills nav-pills-info nav-pills-icons row" role="tablist">
+        <li class="nav-item col-sm-3">
+            <a class="nav-link font-weight-bold active" href="#animas-1" role="tab" data-toggle="tab">
+                {{ __('Ánimas') }}
             </a>
         </li>
-        <li class="nav-item col-sm-6">
-            <a class="nav-link" href="#schedule-1" role="tab" data-toggle="tab">
-                <i class="material-icons" style="font-size: 35px">keyboard_arrow_down</i>
-                {{ __('Redimidos') }}
+        <li class="nav-item col-sm-3">
+            <a class="nav-link font-weight-bold" href="#vanoe-1" role="tab" data-toggle="tab">
+                {{ __('Vanoe') }}
             </a>
         </li>
-    </ul> --}}
+        <li class="nav-item col-sm-3">
+            <a class="nav-link font-weight-bold" href="#aldia-1" role="tab" data-toggle="tab">
+                {{ __('Aldia') }}
+            </a>
+        </li>
+        <li class="nav-item col-sm-3">
+            <a class="nav-link font-weight-bold" href="#dorada-1" role="tab" data-toggle="tab">
+                {{ __('Dorada') }}
+            </a>
+        </li>
+    </ul>
 
     <div class="card mt-4 mb-4">
         <div class="card-body">
@@ -37,82 +45,57 @@
                 <div class="form-group mt-3 col-sm-2">
                     <button id="points" type="submit" class="btn btn-primary">{{ __('Buscar') }}</button>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    {{-- <div class="tab-content tab-space">
-        <div class="tab-pane active" id="dashboard-1"> --}}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header card-header-primary">
-                    <h4 class="card-title">
-                        <a href="{{ route('clients.index') }}" title="Regresar a la lista" class="h4">
-                            <i class="tim-icons icon-minimal-left"></i>
-                        </a>
-                        {{ __('Buscar un usuario') }}
+                <div class="col text-right">
+                    <h4 class="text-primary font-weight-bold">Puntos totales
+                        <p class="text-primary font-weight-bold h3">{{ $client->points }}</p>
                     </h4>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table dataTable table-sm table-no-bordered table-hover white-datatables"
-                            cellspacing="0" width="100%" id="datatable_1">
-                            <thead class=" text-primary">
-                                <th>{{ __('ID de Venta') }}</th>
-                                <th>{{ __('Estación') }}</th>
-                                <th>{{ __('Litros') }}</th>
-                                <th>{{ __('Puntos') }}</th>
-                                <th>{{ __('concepto') }}</th>
-                                <th>{{ __('Fecha y hora') }}</th>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
-        {{-- </div>
-        </div> --}}
-
-        {{-- <div class="tab-pane" id="schedule-1">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table dataTable table-sm table-no-bordered table-hover white-datatables"
-                                    cellspacing="0" width="100%" id="datatable_2">
-                                    <thead class=" text-primary">
-                                        <th>{{ __('Folio') }}</th>
-                                        <th>{{ __('Estación') }}</th>
-                                        <th>{{ __('Status') }}</th>
-                                        <th>{{ __('Puntos') }}</th>
-                                        <th>{{ __('Tipo') }}</th>
-                                        <th>{{ __('Fecha y hora') }}</th>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
     </div>
+
+    <div class="tab-content tab-space">
+        <div class="tab-pane active" id="animas-1">
+            @include('clients.tablepoints',[$stationame='animas'])
+        </div>       
+        <div class="tab-pane" id="vanoe-1">
+            @include('clients.tablepoints',[$stationame='vanoe'])
+        </div>
+        <div class="tab-pane" id="aldia-1">
+            @include('clients.tablepoints',[$stationame='aldia'])
+        </div>
+        <div class="tab-pane" id="dorada-1">
+            @include('clients.tablepoints',[$stationame='dorada'])
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h4 class="card-title">
+                    <a class="btn btn-primary" href="{{ route('clients.index') }}" title="Regresar a la lista" class="h4">
+                        {{ __( 'Regresar' ) }}
+                    </a>
+                </h4>
+            </div>
+        </div>
+    </div>
+
 
 @endsection
 
 @push('js')
     <script>
         $(document).ready(function() {
+            iniciar_date('animas_table');
+            iniciar_date('vanoe_table');
+            iniciar_date('aldia_table');
+            iniciar_date('dorada_table');
             init_calendar('input-date-ini', '01-01-2018', '07-07-2025');
             init_calendar('input-date-end', '01-01-2018', '07-07-2025');
         });
         // Ajax para el historial de puntos
         $("#points").click(function() {
+            document.getElementById('points').disabled = true;
+            document.getElementById('points').innerHTML="Buscando...";
             $.ajax({
                 url: "{{ route('history.points') }}",
                 type: 'GET',
@@ -120,7 +103,7 @@
                 data: {
                     'client_id': $('#input-client_id').val(),
                     'inicial': $('#input-date-ini').val(),
-                    'final': $('#input-date-end').val()
+                    'final': $('#input-date-end').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -128,39 +111,40 @@
                 success: function(response) {
                     demo.showNotification('top', 'center', 'Consulta realizada correctamente.',
                         'tim-icons icon-bell-55');
-                    destruir_table("datatable_1");
-                    // destruir_table("datatable_2");
-                    $('#datatable_1').find('tbody').empty();
-                    // $('#datatable_2').find('tbody').empty();
-                    response.pointsadded.forEach(point => {
-                        let {sale, station, liters, points, concepto, date} = point;
-                        $("#datatable_1").find('tbody').append( /* html */
-                            `<tr>
-                                <td>${sale}</td>
-                                <td>${station}</td>
-                                <td>${liters}</td>
-                                <td>${points}</td>
-                                <td>${concepto}&#170 suma</td>
-                                <td>${date}</td>
-                            </tr>`
-                        );
-                    });
-                    /* for (i = 0; i < response.pointsubstracted.length; i++) {
-                        $("#datatable_2").find('tbody').append(
-                            '<tr><td>' + response.pointsubstracted[i].exchange + '</td><td>' +
-                            response.pointsubstracted[i].station + '</td><td>' + response
-                            .pointsubstracted[i].status + '</td><td>' + response.pointsubstracted[i]
-                            .points + '</td><td>' + response.pointsubstracted[i].type +
-                            '</td><td>' + response.pointsubstracted[i].date + '</td></tr>'
-                        );
-                    } */
-                    iniciar_date('datatable_1');
-                    // iniciar_date('datatable_2');
+                    writeTable(response, 5286, 'animas_table');
+                    writeTable(response, 13771, 'vanoe_table');
+                    writeTable(response, 6532, 'aldia_table');
+                    writeTable(response, 5391, 'dorada_table');
                 },
                 error: function(error) {
                     demo.showNotification('top', 'center', error, 'tim-icons icon-bell-55');
+                },
+                complete: function(data) {
+                    document.getElementById('points').disabled = false;  
+                    document.getElementById('points').innerHTML="Buscar";
                 }
             });
         });
+        // Funcion para escribir los datos de puntos en las tablas
+        function writeTable(response, id, name) {
+            destruir_table(name);
+            $(`#${name}`).find('tbody').empty();
+            response.pointsadded.forEach(point => {
+                let {sale, station, station_id, liters, points, concepto, date} = point;
+                if(station_id == id) {
+                    $(`#${name}`).find('tbody').append( /* html */
+                        `<tr>
+                            <td>${sale}</td>
+                            <td>${station}</td>
+                            <td>${liters}</td>
+                            <td>${points}</td>
+                            <td>${concepto}&#170 suma</td>
+                            <td>${date}</td>
+                        </tr>`
+                    );
+                }
+            });
+            iniciar_date(name);
+        }
     </script>
 @endpush
