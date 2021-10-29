@@ -90,7 +90,7 @@ class SalesImport implements ToCollection
     private function registerAnimasDorada($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists())) {
-            if ((float) $row[7] >= 25)
+            if ((float) $row[7] >= 25 and strtoupper($row[6]) != 'DIESEL')
                 ExcelSale::create([
                     'station_id' => $this->station->id,
                     'ticket' => $row[0],
@@ -98,7 +98,6 @@ class SalesImport implements ToCollection
                     'product' => strtoupper($row[6]),
                     'liters' => $row[7],
                     'payment' => $row[9],
-                    'payment_type' => $row[11]
                 ]);
         }
     }
@@ -106,15 +105,14 @@ class SalesImport implements ToCollection
     private function registerVanoeCholula($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[2], ['date', $date]]])->exists())) {
-            if ((float) $row[10] >= 25)
+            if ((float) $row[10] >= 25 and strtoupper($row[9]) != 'DIESEL')
                 ExcelSale::create([
                     'station_id' => $this->station->id,
-                    'ticket' => $row[2],
+                    'ticket' => '0000000' . $row[2],
                     'date' => $date,
                     'product' => strtoupper($row[9]),
                     'liters' => $row[10],
                     'payment' => $row[12],
-                    'payment_type' => $row[14]
                 ]);
         }
     }
