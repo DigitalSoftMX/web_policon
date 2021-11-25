@@ -28,10 +28,10 @@ function iniciar_date(nombre_tabla)
           zeroRecords:    "No se encontraron elementos coincidentes.",
           emptyTable:     "No hay datos disponibles.",
           paginate: {
-            first:      "<<",
-            previous:   "<",
-            next:       ">",
-            last:       ">>"
+            first:      `<i class="fas fa-angle-double-left"></i>`,
+            previous:   `<i class="fas fa-chevron-left"></i>`,
+            next:       `<i class="fas fa-chevron-right"></i>`,
+            last:       `<i class="fas fa-angle-double-right"></i>`
           },
           aria: {
             sortAscending : "active para ordenar la columna en orden ascendente",

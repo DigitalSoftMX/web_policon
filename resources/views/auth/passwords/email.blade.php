@@ -5,16 +5,16 @@
         <div class="col-sm-4 mt-0 pl-0 pr-0" >
             <form class="form " method="post" action="{{ route('password.email') }}">
                 @csrf
-                <div class="card bg-primary p-0 m-0" style="height: 100vh !important">
+                <div class="card bg-transparent p-0 m-0" style="height: 100vh !important; box-shadow: none !important;">
                     <div class="mt-5 ml-5 mr-5">
                         <div class="mt-5">
-                            <div class="mx-auto d-block col-sm-8 mt-5">
+                            <div class="mx-auto d-block col-sm-12 mt-5">
                                 <h3  class="text-white">RESTABLECER CONTRASEÑA</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="m-5">
-                        <div class="col-sm-8 mx-auto d-block">
+                    <div class="mt-5">
+                        <div class="col-12 col-sm-10 col-md-10 mx-auto d-block">
                             <div class="form-group">
                                 <label for="email" class="text-white">{{ __('Correo electrónico') }}</label>
                                 <div >
