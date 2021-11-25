@@ -3,9 +3,9 @@
 @section('content')
     <div class="row pt-0 pb-0 bg-primary">
         <div class="col-sm-4 mt-0 pl-0 pr-0">
-            <form class="form " method="post" action="{{ route('password.update') }}">
+            <form class="form" method="post" action="{{ route('password.update') }}">
                 @csrf
-                <div class="card bg-success p-0 m-0" style="height: 100vh !important">
+                <div class="card bg-success p-0 m-0" style="height: 100vh !important;">
                     <div class="mt-5 ml-5 mr-5">
                         <div class="mt-5">
                             <div class="mx-auto d-block col-sm-8 mt-5">
