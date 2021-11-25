@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Point;
+use App\Repositories\Activities;
 use App\Web\Client;
 use App\Web\Station;
 use App\Web\Winner;
@@ -19,8 +20,6 @@ class WinnerController extends Controller
     public function index(Request $request)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
-        $stations = Station::where('active', 1)->get();
-        $seeWinner = $stations->where('winner', 0)->count() > 0 ? true : false;
         /* $ids = [];
         $winners = [];
         $stations = Station::where('active', 1)->get();
@@ -93,6 +92,12 @@ class WinnerController extends Controller
             Winner::create(['client_id' => $client->id, 'station_id' => $stationdb->id]);
         $client->winner = 1;
         $client->save();
+        $notify = new Activities();
+        $notify->sendNotification(
+            $client->ids,
+            'Pronto recibirás una llamada de la estación para recibir más información.',
+            '¡GANASTE!'
+        );
         // Enviar notificacion de ganador
         return redirect()->back()->withStatus("Se ha selecionado el ganador de la estación {$stationdb->name}");
     }

@@ -89,31 +89,34 @@ class SalesImport implements ToCollection
     // Registrando informacion de la estacion Ánimas y Dorada
     private function registerAnimasDorada($row, $date)
     {
-        if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists())) {
-            if ((float) $row[7] >= 25 and strtoupper($row[6]) != 'DIESEL')
-                ExcelSale::create([
-                    'station_id' => $this->station->id,
-                    'ticket' => $row[0],
-                    'date' => $date,
-                    'product' => strtoupper($row[6]),
-                    'liters' => $row[7],
-                    'payment' => $row[9],
-                ]);
+        $saleBd = ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists();
+        if (!$saleBd) {
+            $sale = ExcelSale::create([
+                'station_id' => $this->station->id,
+                'ticket' => $row[0],
+                'date' => $date,
+                'product' => strtoupper($row[6]),
+                'liters' => $row[7],
+                'payment' => $row[9],
+            ]);
+            if ($sale->liters < 25 or $sale->product == 'DIESEL')
+                $sale->delete();
         }
     }
     // Regitrando informacion de la estacion Vanoe
     private function registerVanoeCholula($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[2], ['date', $date]]])->exists())) {
-            if ((float) $row[10] >= 25 and strtoupper($row[9]) != 'DIESEL')
-                ExcelSale::create([
-                    'station_id' => $this->station->id,
-                    'ticket' => '0000000' . $row[2],
-                    'date' => $date,
-                    'product' => strtoupper($row[9]),
-                    'liters' => $row[10],
-                    'payment' => $row[12],
-                ]);
+            $sale = ExcelSale::create([
+                'station_id' => $this->station->id,
+                'ticket' => '0000000' . $row[2],
+                'date' => $date,
+                'product' => strtoupper($row[9]),
+                'liters' => $row[10],
+                'payment' => $row[12],
+            ]);
+            if ($sale->liters < 25 and $sale->product == 'DIESEL')
+                $sale->delete();
         }
     }
 }

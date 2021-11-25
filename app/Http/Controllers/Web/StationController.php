@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StationRequest;
 use App\Imports\SalesImport;
 use App\Point;
+use App\Repositories\Activities;
 use App\Web\ExcelSale;
 use App\Web\Station;
 use Illuminate\Http\Request;
@@ -267,6 +268,8 @@ class StationController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->withStatus('Algo salio mal, revise el formato excel para esta estación');
         }
+        $idsClientsAcepted = [];
+        $idsClientsDenied = [];
         foreach (SalesQr::where([['active', 1], ['station_id', $station->id], ['status_id', 1]])->get() as $qr) {
             if (ExcelSale::where([
                 ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
@@ -289,19 +292,27 @@ class StationController extends Controller
                     $qr->update(['points' => $points, 'status_id' => 2]);
                     $qr->client->points += $points;
                     $qr->client->save();
-                    if (($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) != null) {
+                    if ($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) {
                         $poinstation->points += $points;
                         $poinstation->save();
                     } else {
                         Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
                     }
+                    if (!in_array($qr->client->ids, $idsClientsAcepted))
+                        array_push($idsClientsAcepted, $qr->client->ids);
                 } else {
+                    if (!in_array($qr->client->ids, $idsClientsDenied))
+                        array_push($idsClientsDenied, $qr->client->ids);
                     $qr->update(['status_id' => 3]);
                 }
-            } else {
-                $qr->update(['status_id' => 3]);
             }
-            // envio de notificacion
+        }
+        $notify = new Activities();
+        foreach ($idsClientsAcepted as $ids) {
+            $notify->sendNotification($ids, 'Sus puntos han sido sumados');
+        }
+        foreach ($idsClientsDenied as $ids) {
+            $notify->sendNotification($ids, 'Sus puntos no pudieron sumarse, revise que los datos sean correctos');
         }
         return redirect()->back()->withStatus('Ventas cargadas correctamente');
     }

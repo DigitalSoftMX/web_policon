@@ -53,7 +53,46 @@
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
-
+                                        @foreach ($winners[$stations[0]->number_station]['clients'] as $client)
+                                            <tr class="text-center">
+                                                <td>
+                                                    {{ "{$client->user->name} {$client->user->first_surname} {$client->user->second_surname}" }}
+                                                </td>
+                                                <td>{{ $client->user->membership }}</td>
+                                                <td>
+                                                    {{ $client->puntos->where('station_id', $stations[0]->id)->first()->points }}
+                                                </td>
+                                                <td>
+                                                    @if ($seeWinner)
+                                                        <a href="{{ route('clients.points', $client) }}"
+                                                            class="btn btn-blue btn-sm">{{ __('Movimientos') }}
+                                                        </a>
+                                                    @else
+                                                        @if ($client->winner)
+                                                            <a rel="tooltip" class="btn btn-primary btn-link"
+                                                                href="{{ route('clients.edit', $client->user) }}"
+                                                                data-original-title="" title="Ver el cliente">
+                                                                <i class="fas fa-exclamation-circle"></i>
+                                                            </a>
+                                                        @else
+                                                            @if (!$seeWinner)
+                                                                <button class="btn btn-blue btn-sm" disabled>
+                                                                    {{ __('Ganador') }}
+                                                                </button>
+                                                            @else
+                                                                <form
+                                                                    action="{{ route('selectwinner', [$client, $stations[0]->number_station]) }}"
+                                                                    method="post">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="btn btn-blue btn-sm">{{ __('Ganador') }}</button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -78,7 +117,46 @@
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
-
+                                        @foreach ($winners[$stations[3]->number_station]['clients'] as $client)
+                                            <tr class="text-center">
+                                                <td>
+                                                    {{ "{$client->user->name} {$client->user->first_surname} {$client->user->second_surname}" }}
+                                                </td>
+                                                <td>{{ $client->user->membership }}</td>
+                                                <td>
+                                                    {{ $client->puntos->where('station_id', $stations[3]->id)->first()->points }}
+                                                </td>
+                                                <td>
+                                                    @if ($seeWinner)
+                                                        <a href="{{ route('clients.points', $client) }}"
+                                                            class="btn btn-blue btn-sm">{{ __('Movimientos') }}
+                                                        </a>
+                                                    @else
+                                                        @if ($client->winner)
+                                                            <a rel="tooltip" class="btn btn-primary btn-link"
+                                                                href="{{ route('clients.edit', $client->user) }}"
+                                                                data-original-title="" title="Ver el cliente">
+                                                                <i class="fas fa-exclamation-circle"></i>
+                                                            </a>
+                                                        @else
+                                                            @if (!$seeWinner)
+                                                                <button class="btn btn-blue btn-sm" disabled>
+                                                                    {{ __('Ganador') }}
+                                                                </button>
+                                                            @else
+                                                                <form
+                                                                    action="{{ route('selectwinner', [$client, $stations[3]->number_station]) }}"
+                                                                    method="post">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="btn btn-blue btn-sm">{{ __('Ganador') }}</button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -92,19 +170,60 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="table-responsive">
-                            <table class="table dataTable table-sm table-no-bordered table-hover white-datatables"
-                                cellspacing="0" width="100%" id="datatable_3">
-                                <thead class="text-primary text-center">
-                                    <th>{{ __('Nombre') }}</th>
-                                    <th>{{ __('Membresía') }}</th>
-                                    <th>{{ __('Puntos') }}</th>
-                                    <th>{{ __('Acciones') }}</th>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table dataTable table-sm table-no-bordered table-hover white-datatables"
+                                    cellspacing="0" width="100%" id="datatable_3">
+                                    <thead class="text-primary text-center">
+                                        <th>{{ __('Nombre') }}</th>
+                                        <th>{{ __('Membresía') }}</th>
+                                        <th>{{ __('Puntos') }}</th>
+                                        <th>{{ __('Acciones') }}</th>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($winners[$stations[2]->number_station]['clients'] as $client)
+                                            <tr class="text-center">
+                                                <td>
+                                                    {{ "{$client->user->name} {$client->user->first_surname} {$client->user->second_surname}" }}
+                                                </td>
+                                                <td>{{ $client->user->membership }}</td>
+                                                <td>
+                                                    {{ $client->puntos->where('station_id', $stations[2]->id)->first()->points }}
+                                                </td>
+                                                <td>
+                                                    @if ($seeWinner)
+                                                        <a href="{{ route('clients.points', $client) }}"
+                                                            class="btn btn-blue btn-sm">{{ __('Movimientos') }}
+                                                        </a>
+                                                    @else
+                                                        @if ($client->winner)
+                                                            <a rel="tooltip" class="btn btn-primary btn-link"
+                                                                href="{{ route('clients.edit', $client->user) }}"
+                                                                data-original-title="" title="Ver el cliente">
+                                                                <i class="fas fa-exclamation-circle"></i>
+                                                            </a>
+                                                        @else
+                                                            @if (!$seeWinner)
+                                                                <button class="btn btn-blue btn-sm" disabled>
+                                                                    {{ __('Ganador') }}
+                                                                </button>
+                                                            @else
+                                                                <form
+                                                                    action="{{ route('selectwinner', [$client, $stations[2]->number_station]) }}"
+                                                                    method="post">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="btn btn-blue btn-sm">{{ __('Ganador') }}</button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

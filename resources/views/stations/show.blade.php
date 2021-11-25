@@ -16,11 +16,21 @@
                                         <form id="sales" action="{{ route('uploadexcelsales', $station) }}" method="post"
                                             enctype="multipart/form-data">
                                             @csrf
-                                            <input type="file" name="excel" id="file_excel" required onfocus
-                                                accept=".csv,.xlsx,.xls,.ods">
+                                            <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                                                <div class="justify-content-center">
+                                                    <span class="btn btn-info btn-sm btn-file">
+                                                        <span class="fileinput-new">
+                                                            {{ __('Seleccionar Excel') }}
+                                                        </span>
+                                                        <span class="fileinput-exists">{{ __('Cambiar Excel') }}</span>
+                                                        <input type="file" name="excel" id="file_excel" required onfocus
+                                                            accept=".csv,.xlsx,.xls,.ods">
+                                                    </span>
+                                                </div>
+                                            </div>
                                             <button type="submit" id="btnFetch"
                                                 class="spinner-button btn btn-sm btn-danger">
-                                                {{ __('Cargar excel') }}
+                                                {{ __('Subir excel') }}
                                             </button>
                                             @if ($errors->has('excel'))
                                                 <br>

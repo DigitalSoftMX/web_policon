@@ -32,10 +32,8 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        // set_time_limit(8000000);
         // Roles autorizados para el dashboard
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion', ]);
-
         // redireccionar al usuario admin_estacion
         if ($request->user()->roles[0]->name == 'admin_estacion') {
             $admin_station = AdminStation::where('user_id', $request->user()->id)->first();
