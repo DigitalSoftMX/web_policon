@@ -1,14 +1,103 @@
 @extends('layouts.app', ['pageSlug' => 'dashboard', 'titlePage' => __('dashboard')])
 
 @section('content')
-
     <div class="tab-content text-center">
-        <!--div class="tab-pane active" id="home">
-                    
-                </div-->
         <div class="row">
             <div class="col-12 text-left mb-3">
-                <a href="#" class="btn btn-danger">Iniciar nuevo periodo</a>
+                @isset($currentperiod)
+                    @if ($currentperiod->winner == 0)
+                        <form class="form" id="finish" action="{{ route('periods.update', $currentperiod) }}"
+                            method="POST">
+                            @method('put')
+                            @csrf
+                            <button type="button" class="btn btn-danger"
+                                onclick="confirm('¿Esta seguro que desea finalizar el periodo?')?document.getElementById('finish').submit() : '';">
+                                {{ __('Finalizar periodo') }}
+                            </button>
+                        </form>
+                    @else
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#period">
+                            {{ __('Iniciar nuevo periodo') }}
+                        </button>
+                    @endif
+                @else
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#period">
+                        {{ __('Iniciar nuevo periodo') }}
+                    </button>
+                @endisset
+                <div class="modal fade" id="period" tabindex="-1" role="dialog" aria-labelledby="periodLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title text-primary" id="periodLabel">
+                                    <strong>{{ __('Selecciona el periodo de activación') }}</strong>
+                                </h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h5>{{ __('Una vez seleccinado el periodo los usuarios podrán comenzar a realizar la suma de sus puntos') }}
+                                </h5>
+                                <form class="form" id="init" action="{{ route('periods.store') }}"
+                                    method="POST">
+                                    @csrf
+                                    <div class="row justify-content-center">
+                                        <div class="form-group col-12 col-sm-6">
+                                            <label class="label-control">{{ __('Fecha de inicio') }}</label>
+                                            <input class="form-control datetimepicker" id="input-date-ini" name="date_start"
+                                                type="text" value="" placeholder="Fecha de inicio">
+                                            @if ($errors->has('date_start'))
+                                                <span id="date_start-error" class="error text-danger"
+                                                    for="input-date_start">
+                                                    {{ $errors->first('date_start') }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="form-group col-12 col-sm-6">
+                                            <label class="label-control">{{ __('Fecha de término') }}</label>
+                                            <input class="form-control datetimepicker" id="input-date-end" name="date_end"
+                                                type="text" value="" placeholder="Fecha de término">
+                                            @if ($errors->has('date_end'))
+                                                <span id="date_end-error" class="error text-danger" for="input-date_end">
+                                                    {{ $errors->first('date_end') }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="form-group col-12 col-sm-6">
+                                            <label class="label-control">{{ __('Hora de inicio') }}</label>
+                                            <input class="form-control datetimepicker" id="input-date-ini" name="hour_start"
+                                                type="time" value="" placeholder="Fecha de inicio">
+                                            @if ($errors->has('hour_start'))
+                                                <span id="hour_start-error" class="error text-danger"
+                                                    for="input-hour_start">
+                                                    {{ $errors->first('hour_start') }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div class="form-group col-12 col-sm-6">
+                                            <label class="label-control">{{ __('Hora de término') }}</label>
+                                            <input class="form-control datetimepicker" id="input-date-end" name="hour_end"
+                                                type="time" value="" placeholder="Fecha de término">
+                                            @if ($errors->has('hour_end'))
+                                                <span id="hour_end-error" class="error text-danger" for="input-hour_end">
+                                                    {{ $errors->first('hour_end') }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-info"
+                                    onclick="confirm('¿Esta seguro que desea iniciar con la activacion de la promoción?')?document.getElementById('init').submit() : '';">
+                                    {{ __('Iniciar periodo') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="tab-pane active" id="updates">
@@ -16,20 +105,14 @@
                 <div class="col-sm-3">
                     <div class="card">
                         <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">Usuarios registrados</h6>
-                            <h3 class="title mb-0">{{ number_format($clientes_totales, 0) }}</h3>
-                            @if ($clientes_mes_actual > 0)
-                                <a class="text-success mt-0 mb-0">
-                                    +{{ $clientes_mes_actual }}
-                                </a>
-                            @elseif($clientes_mes_actual == 0)
-                                <a class="text-muted mt-0 mb-0">
-                                    {{ $clientes_mes_actual }}
-                                </a>
+                            <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Usuarios registrados') }}</h6>
+                            <h3 class="title mb-0">{{ $totalclients }}</h3>
+                            @if ($clientsCurrentMonth > 0)
+                                <a class="text-success"> +{{ $clientsCurrentMonth }} </a>
+                            @elseif($clientsCurrentMonth == 0)
+                                <a class="text-info"> {{ $clientsCurrentMonth }} </a>
                             @else
-                                <a class="text-danger mt-0 mb-0">
-                                    {{ $clientes_mes_actual }}
-                                </a>
+                                <a class="text-danger"> {{ $clientsCurrentMonth }} </a>
                             @endif
                         </div>
                     </div>
@@ -38,9 +121,19 @@
                 <div class="col-sm-3">
                     <div class="card">
                         <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">Total de vales entregados</h6>
-                            <h3 class="title mb-0">{{ number_format($dashboar['exchange'], 0) }}</h3>
-                            <a class=" mt-1 mb-1">
+                            <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Litros vendidos por periodo') }}</h6>
+                            <h3 class="title mb-0">{{ $litersInThisPeriod }}</h3>
+                            <a class="text-info">{{ $period }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                    <div class="card">
+                        <div class="card-body text-left">
+                            <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Tickets registrados') }}</h6>
+                            <h3 class="title mt-0 mb-0">{{ number_format($tickets, 0) }}</h3>
+                            <a class="mt-1 mb-1">
                                 <br>
                             </a>
                         </div>
@@ -50,616 +143,23 @@
                 <div class="col-sm-3">
                     <div class="card">
                         <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">litros vendidos</h6>
-                            <h3 class="title mb-0">{{ number_format($dashboar['liters'], 2) }}</h3>
-                            <a class=" mt-1 mb-1">
+                            <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('litros vendidos') }}</h6>
+                            <h3 class="title mb-0">{{ $totaliters }}</h3>
+                            <a class="mt-1 mb-1">
                                 <br>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-3">
-                    <div class="card">
-                        <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">total de tickets escaneados</h6>
-                            <h3 class="title mt-0 mb-0">{{ number_format($dashboar['tickets'], 0) }}</h3>
-                            <a class=" mt-1 mb-1">
-                                <br>
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
-
-            <div class="row">
-                <div class="col-lg-8">
-                    <x-MainGraphicsDashboard number="4" :stations="$stations" />
-                </div>
-                <div class="col-lg-4">
-                    <x-DetailsStationDashboard title="DETALLES POR ESTACIÓN" :stations="$stations" />
-                </div>
-            </div>
-
-            @php
-                $m = 0;
-            @endphp
-
-            <div id="carouselExampleInterval" class="carousel slide m-4" data-ride="carousel">
-
-                <div class="carousel-inner">
-                    @for ($i = 1; $i < 5; $i++)
-                        <div class="carousel-item @if ($i == 1) active @endif" data-interval="10000">
-                            <div class="d-block w-100">
-                                <div class="row">
-                                    @for ($j = 1; $j < 4; $j++)
-
-                                        <div class="col-lg-4">
-                                            <div class="card card-chart">
-                                                <div class="card-header">
-                                                    <div class="row">
-                                                        <div class="col-12 text-left">
-                                                            <a class="text-muted">Litros vendidos por estación
-                                                                MENSUAL</a>
-                                                        </div>
-                                                        <div class="col-12 text-left">
-                                                            <a
-                                                                class="text-success font-weight-bold h4">{{ $array_meses_largos[$m] }}</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="chart-area pl-2 pr-3">
-                                                        <canvas id="chartLineGreen{{ $m }}"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @php
-                                            $m++;
-                                        @endphp
-                                    @endfor
-                                </div>
-                            </div>
-                        </div>
-
-
-                    @endfor
-                </div>
-                <a class="carousel-control-prev" href="#carouselExampleInterval" role="button" data-slide="prev">
-                    <i class="tim-icons icon-minimal-left text-white"></i>
-                </a>
-                <a class="carousel-control-next" href="#carouselExampleInterval" role="button" data-slide="next">
-                    <i class="tim-icons icon-minimal-right text-white"></i>
-                </a>
-            </div>
-
-            {{-- <x-ComparativeGraphDashboard :mounts="$array_meses_largos" :stations="$stations" :chart="$dashboar" /> --}}
-
-
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="card overflowCards card-chart">
-                        <div class="card-header text-left">
-                            <div class="row">
-                                <div class="col-sm-7">
-                                    <h4 class="titlee text-muted font-weight-bold p-0 m-0 pl-4 pt-2" id="valesTotalH4">
-                                    </h4>
-                                </div>
-                                <div class="col-sm-5 text-right">
-                                    <select id="select_dash_2" class="selectpicker show-menu-arrow pr-4"
-                                        data-style="btn-simple btn-github" data-width="50%">
-                                        @for ($md = 0; $md < 12; $md++)
-                                            <option value="{{ $md }}">{{ $array_meses_largos[$md] }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="chart-area mt-5 pl-5 pr-2 mr-5">
-                                    <canvas id="CountryChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="card overflowCards card-chart">
-                        <div class="card-header text-left">
-                            <div class="row">
-                                <div class="col-sm-7">
-                                    <h4 class="titlee text-muted font-weight-bold p-0 m-0 pl-4 pt-2" id="ticketsTotalH4">
-                                    </h4>
-                                </div>
-                                <div class="col-sm-5 text-right">
-                                    <select id="select_dash_3" class="selectpicker show-menu-arrow pr-4"
-                                        data-style="btn-simple btn-github" data-width="50%">
-                                        @for ($md = 0; $md < 12; $md++)
-                                            <option value="{{ $md }}">{{ $array_meses_largos[$md] }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="chart-area mt-5 pl-5 pr-2 mr-5">
-                                    <canvas id="CountryChart2"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="tab-pane" id="history">
-            <div class="row">
-                <div class="col-sm-3">
-                    <div class="card">
-                        <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">Usuarios registrados</h6>
-                            <h3 class="title mb-0">{{ $clientes_totales }}</h3>
-                            @if ($clientes_mes_actual > 0)
-                                <a class="text-success mt-0 mb-0">
-                                    +{{ $clientes_mes_actual }}
-                                </a>
-                            @elseif($clientes_mes_actual == 0)
-                                <a class="text-muted mt-0 mb-0">
-                                    {{ $clientes_mes_actual }}
-                                </a>
-                            @else
-                                <a class="text-danger mt-0 mb-0">
-                                    {{ $clientes_mes_actual }}
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-3">
-                    <div class="card">
-                        <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">Ventas totales</h6>
-                            <h3 class="title mb-0">{{ $ventas_totales }}</h3>
-                            @if ($crecimiento > 0)
-                                <a class="text-success mt-0 mb-0">
-                                    +{{ $crecimiento }}%
-                                </a>
-                            @elseif($crecimiento == 0)
-                                <a class="text-muted mt-0 mb-0">
-                                    {{ $crecimiento }}%
-                                </a>
-                            @else
-                                <a class="text-danger mt-0 mb-0">
-                                    {{ $crecimiento }}%
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-3">
-                    <div class="card">
-                        <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">Litros vendidos</h6>
-                            <h3 class="title mb-0">{{ $suma_tem_final }}</h3>
-                            <a class="text-success mt-0 mb-0">
-                                @if ($crecimiento_litros > 0)
-                                    <a class="text-success mt-0 mb-0">
-                                        +{{ $crecimiento_litros }}%
-                                    </a>
-                                @elseif( $crecimiento_litros == 0)
-                                    <a class="text-muted mt-0 mb-0">
-                                        {{ $crecimiento_litros }}%
-                                    </a>
-                                @else
-                                    <a class="text-danger mt-0 mb-0">
-                                        {{ $crecimiento_litros }}%
-                                    </a>
-                                @endif
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-3">
-                    <div class="card">
-                        <div class="card-body text-left">
-                            <h6 class="card-subtitle mt-0 mb-0 text-muted">Abonos pendientes</h6>
-                            {{-- <h3 class="title mt-0 mb-0">{{$abonos_totales}}</h3> --}}
-                            <a href="{{ route('balance.index') }}" class="badge badge-success mt-0 mb-0">
-                                Autorizar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="carouselExampleInterval" class="carousel slide" data-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active" data-interval="10000">
-                        <div class="d-block w-100">
-                            <div class="row">
-                                @foreach ($stations as $key => $estacion)
-                                    @if ($key <= 2)
-                                        <div class="col-lg-4">
-                                            <div class="card card-chart">
-                                                <div class="card-header">
-                                                    <div class="row">
-                                                        <div class="col-1">
-                                                            <i
-                                                                class="material-icons card-title md-24 text-light">local_gas_station</i>
-                                                        </div>
-                                                        <div class="col-11">
-                                                            <a class="title card-title h4">{{ $estacion->name }}</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="chart-area">
-                                                        <canvas id="chartLinePurple{{ $key }}"></canvas>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4 mx-auto d-block">
-                                                    <a class="btn btn-success btn-sm"
-                                                        href="{{ route('stations.show', $estacion) }}">Ver más</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item" data-interval="10000">
-                        <div class="d-block w-100">
-                            <div class="row">
-                                @foreach ($stations as $key => $estacion)
-                                    @if ($key > 2 && $key <= 5)
-                                        <div class="col-lg-4">
-                                            <div class="card card-chart">
-                                                <div class="card-header">
-                                                    <div class="row">
-                                                        <div class="col-1">
-                                                            <i
-                                                                class="material-icons card-title md-24 text-light">local_gas_station</i>
-                                                        </div>
-                                                        <div class="col-11">
-                                                            <a class="title card-title h4">{{ $estacion->name }}</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="chart-area">
-                                                        <canvas id="chartLinePurple{{ $key }}"></canvas>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4 mx-auto d-block">
-                                                    <a class="btn btn-success btn-sm"
-                                                        href="{{ route('stations.show', $estacion) }}">Ver más</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <div class="d-block w-100">
-                            <div class="row">
-                                @foreach ($stations as $key => $estacion)
-                                    @if ($key > 5)
-                                        <div class="col-lg-4">
-                                            <div class="card card-chart">
-                                                <div class="card-header">
-                                                    <div class="row">
-                                                        <div class="col-1">
-                                                            <i
-                                                                class="material-icons card-title md-24 text-light">local_gas_station</i>
-                                                        </div>
-                                                        <div class="col-11">
-                                                            <a class="title card-title h4">{{ $estacion->name }}</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="chart-area">
-                                                        <canvas id="chartLinePurple{{ $key }}"></canvas>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4 mx-auto d-block">
-                                                    <a class="btn btn-success btn-sm"
-                                                        href="{{ route('stations.show', $estacion) }}">Ver más</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <a class="carousel-control-prev" href="#carouselExampleInterval" role="button" data-slide="prev">
-                    <i class="tim-icons icon-minimal-left text-white"></i>
-                </a>
-                <a class="carousel-control-next" href="#carouselExampleInterval" role="button" data-slide="next">
-                    <i class="tim-icons icon-minimal-right text-white"></i>
-                </a>
-            </div>
-
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="card card-chart">
-                        <div class="card-header">
-                            <h5 class="card-category">Ventas totales por estación</h5>
-                            <h3 class="card-title">
-                                {{ $suma_tem_final }}L
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-area">
-                                <canvas id="chartLineGreen"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="card card-chart">
-                        <div class="card-header ">
-                            <div class="row">
-                                <div class="col-sm-4 text-left">
-                                    <h5 class="card-category">Ventas totales</h5>
-                                    <h2 class="card-title">Litros</h2>
-                                </div>
-                                <div class="col-sm-8">
-                                    <div class="btn-group btn-group-toggle mx-auto d-block" data-toggle="buttons">
-                                        <label class="btn btn-sm btn-success btn-simple active" id="0">
-                                            <input type="radio" name="options" checked>
-                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Magna</span>
-                                            <span class="d-block d-sm-none">
-                                                MA
-                                            </span>
-                                        </label>
-                                        <label class="btn btn-sm btn-danger btn-simple" id="1">
-                                            <input type="radio" class="d-none d-sm-none" name="options">
-                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Premium</span>
-                                            <span class="d-block d-sm-none">
-                                                PR
-                                            </span>
-                                        </label>
-                                        <label class="btn btn-sm btn-dark btn-simple" id="2">
-                                            <input type="radio" class="d-none" name="options">
-                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Diésel</span>
-                                            <span class="d-block d-sm-none">
-                                                DI
-                                            </span>
-                                        </label>
-                                        <label class="btn btn-sm btn-primary btn-simple" id="3">
-                                            <input type="radio" class="d-none" name="options">
-                                            <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Ventas
-                                                totales</span>
-                                            <span class="d-block d-sm-none">
-                                                VT
-                                            </span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-area">
-                                <canvas id="chartBig1"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
         </div>
     </div>
-
-
-
 @endsection
 
 @push('js')
-
     <script>
-        function initDashboardPageCharts() {
-            var liters_mouths = @json($dashboar['liters_mouths']);
-
-            var stations_mouths_tickets = @json($dashboar['stations_mouths_tickets']);
-            var stations_mouths_exchage = @json($dashboar['stations_mouths_exchage']);
-            var stations = @json($stations);
-
-
-
-            @foreach ($stations as $key => $estacion)
-                var ctx = document.getElementById("chartLinePurple{{ $key }}").getContext("2d");
-            
-                var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-            
-                gradientStroke.addColorStop(1, 'rgba(0, 0, 0,.2)');
-                gradientStroke.addColorStop(0.5, 'rgba(5, 5, 5,.0)');
-                gradientStroke.addColorStop(0, 'rgba(10, 10, 10,0)');
-            
-                var data = {
-                labels: @json($array_meses),
-                datasets: [{
-                label: "Litros vendidos en el mes",
-                fill: true,
-                backgroundColor: gradientStroke,
-                borderColor: '#00c907',
-                borderWidth: 2,
-                borderDash: [],
-                borderDashOffset: 0.0,
-                pointBackgroundColor: '#007d04',
-                pointBorderColor: 'rgba(255,255,255,0)',
-                pointHoverBackgroundColor: '#d346b1',
-                pointBorderWidth: 20,
-                pointHoverRadius: 4,
-                pointHoverBorderWidth: 15,
-                pointRadius: 4,
-                data: @json($meses_ventas_estacion[$key]),
-                }]
-                };
-            
-                var myChart = new Chart(ctx, {
-                type: 'line',
-                data: data,
-                options: gradientChartOptionsConfigurationWithTooltipPurple
-                });
-            @endforeach
-
-
-            // grafica de pastel
-            var ctxGreen = document.getElementById("chartLineGreen").getContext("2d");
-
-            /*var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-            gradientStroke.addColorStop(1, 'rgba(66,134,121,0.15)');
-            gradientStroke.addColorStop(0.4, 'rgba(66,134,121,0.0)'); //green colors
-            gradientStroke.addColorStop(0, 'rgba(66,134,121,0)'); //green colors*/
-
-            var data = {
-                labels: [
-                    @foreach ($stations as $station)
-                        '{{ $station->name }}',
-                    @endforeach
-                ],
-                datasets: [{
-                    backgroundColor: [
-                        'rgb(7, 120, 1)',
-                        'rgb(8, 138, 1)',
-                        'rgb(9, 156, 2)',
-                        'rgb(30, 161, 24)',
-                        'rgb(27, 179, 20)',
-                        'rgb(13, 199, 4)',
-                        'rgb(12, 214, 2)',
-                        'rgb(16, 245, 5)',
-                    ],
-                    borderColor: '#0b9e03',
-                    borderWidth: 2,
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    pointBackgroundColor: '#0b9e03',
-                    pointBorderColor: 'rgba(255,255,255,0)',
-                    pointHoverBackgroundColor: '#0b9e03',
-                    pointBorderWidth: 20,
-                    pointHoverRadius: 4,
-                    pointHoverBorderWidth: 15,
-                    pointRadius: 4,
-                    data: @json($suma_li_tem),
-                }],
-            };
-
-
-
-            var myChart = new Chart(ctxGreen, {
-                type: 'doughnut',
-                data: data,
-                options: gradientChartOptionsConfigurationWithTooltipGreen
-            });
-
-
-            //graficas de pastel
-
-            var chart_labels = @json($array_meses);
-            var chart_data = @json($litros_magna_meses);
-
-
-            var ctx = document.getElementById("chartBig1").getContext('2d');
-
-            var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-            gradientStroke.addColorStop(1, 'rgba(0, 0, 0,.2)');
-            gradientStroke.addColorStop(0.5, 'rgba(5, 5, 5,.0)');
-            gradientStroke.addColorStop(0, 'rgba(10, 10, 10,0)');
-            //purple colors
-            var config = {
-                type: 'line',
-                data: {
-                    labels: chart_labels,
-                    datasets: [{
-                        label: "Total de litros al mes",
-                        fill: true,
-                        backgroundColor: gradientStroke,
-                        borderColor: '#00c907',
-                        borderWidth: 2,
-                        borderDash: [],
-                        borderDashOffset: 0.0,
-                        pointBackgroundColor: '#007d04',
-                        pointBorderColor: 'rgba(255,255,255,0)',
-                        pointHoverBackgroundColor: '#d346b1',
-                        pointBorderWidth: 20,
-                        pointHoverRadius: 4,
-                        pointHoverBorderWidth: 15,
-                        pointRadius: 4,
-                        data: chart_data,
-                    }]
-                },
-                options: gradientChartOptionsConfigurationWithTooltipPurple
-            };
-
-
-            /*------------- */
-            // nueva grafica
-
-
-            $("#select_dash_3").change(function() {
-                php_variable_3 = document.getElementById("select_dash_3").value;
-                const total3 = stations_mouths_tickets[php_variable_3].reduce((a, b) => a + b);
-                document.getElementById("ticketsTotalH4").innerHTML = "Total de tickets escaneados: " + total3 + "";
-                myChartL.destroy();
-                myChartL = new Chart(ctx, {
-                    type: 'bar',
-                    responsive: true,
-                    data: {
-                        labels: [
-                            @foreach ($stations as $station)
-                                '',
-                            @endforeach
-                        ],
-                        datasets: [
-                            @foreach ($stations as $key => $station)
-                                {
-                                label: '{{ $station->abrev }}: '+stations_mouths_tickets[php_variable_3][{{ $key }}]+' ',
-                                fill: true,
-                                backgroundColor: colors2[{{ $key }}],
-                                hoverBackgroundColor: colors2[{{ $key }}],
-                                borderColor: '#ffffff',
-                                borderWidth: 2,
-                                borderDash: [],
-                                borderDashOffset: 0.0,
-                                data:[stations_mouths_tickets[php_variable_3][{{ $key }}]],
-                                },
-                            @endforeach
-
-                        ]
-                    },
-                    options: gradientBarChartConfiguration
-                });
-            });
-
-
-            //var chart_labelsL = @json($array_meses);
-            //var chart_dataL = @json($litros_magna_meses);
-
-            @stack('dash')
-
-        };
-        $(document).ready(function() {
-            initDashboardPageCharts();
-            $('.carousel').carousel();
-        });
+        init_calendar('input-date-ini', "{{ $start }}");
+        init_calendar('input-date-end', "{{ $start }}");
     </script>
 @endpush

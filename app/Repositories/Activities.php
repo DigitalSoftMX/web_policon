@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use DateTime;
 use Exception;
 
 class Activities
@@ -36,5 +37,16 @@ class Activities
         } catch (Exception $e) {
             return false;
         }
+    }
+    // Lista de meses en español
+    public function getNameMonthSpanish($date)
+    {
+        $date = DateTime::createFromFormat('Y-m-d', $date);
+        $months = [
+            '01' => 'Ene', '02' => 'Feb', '03' => 'Mar', '04' => 'Abr',
+            '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Ago',
+            '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Dic',
+        ];
+        return $months[$date->format('m')];
     }
 }

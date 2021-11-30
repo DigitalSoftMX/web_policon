@@ -4,9 +4,17 @@
     <div class="row mb-2">
         <div class="col-3">
             @if ($seeWinner)
-                <a href="{{ route('finishcompetition') }}" class="btn btn-danger">
-                    {{ __('Finalizar periodo') }}
-                </a>
+                @isset($currentperiod)
+                    <form class="form" id="finish" action="{{ route('periods.update', $currentperiod) }}"
+                        method="POST">
+                        @method('put')
+                        @csrf
+                        <button type="button" class="btn btn-danger"
+                            onclick="confirm('¿Esta seguro que desea finalizar el periodo?')?document.getElementById('finish').submit() : '';">
+                            {{ __('Finalizar periodo') }}
+                        </button>
+                    </form>
+                @endisset
             @else
                 <button class="btn btn-dark" disabled>
                     {{ __('Finalizar periodo') }}
