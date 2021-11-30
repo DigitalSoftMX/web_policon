@@ -24,7 +24,17 @@ class SalesImport implements ToCollection
     {
         foreach ($rows as $row) {
             try {
-                switch ($this->station->number_station) {
+                if (stristr($row[0], '0000000')) {
+                    if (is_int($row[4]) or is_double($row[4])) {
+                        $phpdate = ($row[4] - 25569) * 86400;
+                        $date = gmdate("Y-m-d H:i:s", $phpdate);
+                    } else {
+                        $date = new DateTime($row[4]);
+                        $date = $date->format('Y-m-d H:i:s');
+                    }
+                    $this->registerAnimasDorada($row, $date);
+                }
+                /* switch ($this->station->number_station) {
                     case 6532:
                         // Aldia Cholula
                         if (is_int($row[2])) {
@@ -81,7 +91,7 @@ class SalesImport implements ToCollection
                             $this->registerAnimasDorada($row, $date);
                         }
                         break;
-                }
+                } */
             } catch (Exception $e) {
             }
         }
@@ -103,7 +113,7 @@ class SalesImport implements ToCollection
                 $sale->delete();
         }
     }
-    // Regitrando informacion de la estacion Vanoe
+    // Regitrando informacion de la estacion Vanoe y Cholula
     private function registerVanoeCholula($row, $date)
     {
         if (!(ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[2], ['date', $date]]])->exists())) {
