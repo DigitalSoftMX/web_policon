@@ -23,18 +23,17 @@ class SalesImport implements ToCollection
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            try {
-                if (stristr($row[0], '0000000')) {
-                    if (is_int($row[4]) or is_double($row[4])) {
-                        $phpdate = ($row[4] - 25569) * 86400;
-                        $date = gmdate("Y-m-d H:i:s", $phpdate);
-                    } else {
-                        $date = new DateTime($row[4]);
-                        $date = $date->format('Y-m-d H:i:s');
-                    }
-                    $this->registerAnimasDorada($row, $date);
+            if (stristr($row[0], '0000000')) {
+                if (is_int($row[4]) or is_double($row[4])) {
+                    $phpdate = ($row[4] - 25569) * 86400;
+                    $date = gmdate("Y-m-d H:i:s", $phpdate);
+                } else {
+                    $date = new DateTime($row[4]);
+                    $date = $date->format('Y-m-d H:i:s');
                 }
-                /* switch ($this->station->number_station) {
+                $this->registerAnimasDorada($row, $date);
+            }
+            /* switch ($this->station->number_station) {
                     case 6532:
                         // Aldia Cholula
                         if (is_int($row[2])) {
@@ -92,8 +91,6 @@ class SalesImport implements ToCollection
                         }
                         break;
                 } */
-            } catch (Exception $e) {
-            }
         }
     }
     // Registrando informacion de la estacion Ánimas y Dorada

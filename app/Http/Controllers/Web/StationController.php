@@ -70,74 +70,32 @@ class StationController extends Controller
         $station_show = array();
 
         $array_meses_espanol = [
-            "Enero",
-            "Febrero",
-            "Marzo",
-            "Abril",
-            "Mayo",
-            "Junio",
-            "Julio",
-            "Agosto",
-            "Septiembre",
-            "Octubre",
-            "Noviembre",
-            "Diciembre"
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         ];
 
         $array_meses_espanol_corto = [
-            "Jan" => "Ene",
-            "Feb" => "Feb",
-            "Mar" => "Mar",
-            "Apr" => "Abr",
-            "May" => "May",
-            "Jun" => "Jun",
-            "Jul" => "Jul",
-            "Aug" => "Ago",
-            "Sep" => "Sep",
-            "Oct" => "Oct",
-            "Nov" => "Nov",
-            "Dec" => "Dic"
+            "Jan" => "Ene", "Feb" => "Feb", "Mar" => "Mar", "Apr" => "Abr",
+            "May" => "May", "Jun" => "Jun", "Jul" => "Jul", "Aug" => "Ago",
+            "Sep" => "Sep", "Oct" => "Oct", "Nov" => "Nov", "Dec" => "Dic"
         ];
-
-        $array_meses_numero = [
-            "01",
-            "02",
-            "03",
-            "04",
-            "05",
-            "06",
-            "07",
-            "08",
-            "09",
-            "10",
-            "11",
-            "12"
-        ];
-
         // array para los meses
         $array_meses = [];
-        $array_meses_largos = [];
         $meses_hasta_el_actual = [];
-
         //for para llenar el array con los meses hasta el actual
         for ($i = 1; $i <= 11; $i++) {
             array_push($meses_hasta_el_actual, date("Y-m", mktime(0, 0, 0, date("m") - $i, 28, date("Y"))));
             array_push($array_meses, $array_meses_espanol_corto[strval(date("M", mktime(0, 0, 0, date("m") - $i, 28, date("Y"))))]);
-            //array_push($array_meses_largos, $array_meses_espanol[strval(date("M", mktime(0, 0, 0, date("m") - $i, 28, date("Y"))))]);
         }
 
         array_unshift($meses_hasta_el_actual, date("Y-m", mktime(0, 0, 0, date("m"), 28, date("Y"))));
         array_unshift($array_meses,  $array_meses_espanol_corto[strval(date("M", mktime(0, 0, 0, date("m"), 28, date("Y"))))]);
-        //array_unshift($array_meses_largos,  $array_meses_espanol[strval(date("M", mktime(0, 0, 0, date("m"), 28, date("Y"))))]);
 
         $station_show['meses'] = array_reverse($array_meses);
         $station_show['meses_largos'] = $array_meses_espanol;
         $meses_hasta_el_actual = array_reverse($meses_hasta_el_actual);
 
-
         $station = $request->user()->station(Auth::user(), $station);
-        //dd($station->exchanges->count());
-        //dd(Ticket::where('id_gas',$station->id)->where('descrip', 'puntos sumados')->count() + Ticket::where('id_gas',$station->id)->where('descrip', 'Puntos Dobles Sumados')->count() + SalesQr::where('station_id',$station->id)->count());
         $mes_anterior = date('m', strtotime('-1 month'));
         $mes_actual = date('m');
         $year = date('Y');
@@ -160,17 +118,10 @@ class StationController extends Controller
             $sales = $lastMontSales * 100;
         }
 
-        // ventas de producto
-        /* $total_magna = $station->sales()->where('gasoline_id', '1')->sum('liters');
-        $total_premium = $station->sales()->where('gasoline_id', '2')->sum('liters');
-        $total_diesel = $station->sales()->where('gasoline_id', '3')->sum('liters'); */
         $total_magna = 0;
         $total_premium = 0;
         $total_diesel = 0;
 
-
-        /* $station_show['tickets'] = Ticket::where([['id_gas', $station->id], ['descrip', 'like', '%sumados%']])->count() + SalesQr::where('station_id', $station->id)->count();
-        $station_show['liters'] = Ticket::where([['id_gas', $station->id], ['descrip', 'like', '%sumados%']])->sum('litro') + SalesQr::where('station_id', $station->id)->sum('liters'); */
         $station_show['tickets'] = 0;
         $station_show['liters'] = 0;
         $station_mouths_magna = [];
@@ -179,32 +130,27 @@ class StationController extends Controller
         $station_tickets_mounths_1 = [];
 
         for ($mes = 0; $mes <= 11; $mes++) {
-            /* array_push($station_mouths_magna, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'magna'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + SalesQr::where([['station_id', '=', $station->id], ['gasoline_id', '=', 1], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('liters'));
-            array_push($station_mouths_magna, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'magna'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + SalesQr::where([['station_id', '=', $station->id], ['gasoline_id', '=', 1], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('liters')); */
-            /* array_push($station_mouths_premium, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'premium'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + 0);
-            array_push($station_mouths_premium, Ticket::where([['id_gas', '=', $station->id], ['producto', '=', 'premium'], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . $meses_hasta_el_actual[$mes] . '%']])->sum('litro') + 0); */
             array_push($station_mouths_premium, 0);
             array_push($station_mouths_premium, 0);
         }
 
         for ($yearN = 0; $yearN < 3; $yearN++) {
             for ($mes = 0; $mes <= 11; $mes++) {
-                /* array_push($station_exchange_mounths_1, Exchange::where([['station_id', $station->id], ['status', 14], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count());
-                array_push($station_tickets_mounths_1, Ticket::where([['id_gas', '=', $station->id], ['descrip', 'like', '%sumados%'], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count() + SalesQr::where([['station_id', '=', $station->id], ['created_at', 'like', '%' . (((int)$year) - $yearN) . '-' . $array_meses_numero[$mes] . '%']])->count()); */
                 array_push($station_exchange_mounths_1, 0);
                 array_push($station_tickets_mounths_1, 0);
             }
         }
-
-        //dd(array_chunk($station_exchange_mounths_1, 12));
 
         $station_show['magna'] = $station_mouths_magna;
         $station_show['premium'] = $station_mouths_premium;
         $station_show['vales_meses'] = array_chunk($station_exchange_mounths_1, 12);
         $station_show['tickets_meses'] = array_chunk($station_tickets_mounths_1, 12);
 
-
-        return view('stations.show', ['station_show' => $station_show, 'station' => $station, 'liters' => $liters, 'sales' => $sales, 'estacion_dashboard' => $request->estacion_dashboard, 'total_magna' => $total_magna, 'total_premium' => $total_premium, 'total_diesel' => $total_diesel]);
+        return view('stations.show', [
+            'station_show' => $station_show, 'station' => $station, 'liters' => $liters, 'sales' => $sales,
+            'estacion_dashboard' => $request->estacion_dashboard, 'total_magna' => $total_magna,
+            'total_premium' => $total_premium, 'total_diesel' => $total_diesel
+        ]);
     }
 
     /**

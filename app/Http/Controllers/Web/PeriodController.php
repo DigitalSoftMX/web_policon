@@ -20,8 +20,8 @@ class PeriodController extends Controller
         $lastperiod = Period::all()->last();
 
         request()->validate([
-            'date_start' =>  $lastperiod ? "required|date_format:Y-m-d H:i:s|after:{$lastperiod->date_end}" : 'required|date_format:Y-m-d H:i:s',
-            'date_end' => 'required|date_format:Y-m-d H:i:s|after:date_start',
+            'date_start' =>  $lastperiod ? "required|date_format:Y-m-d H:i|after:{$lastperiod->date_end}" : 'required|date_format:Y-m-d H:i',
+            'date_end' => 'required|date_format:Y-m-d H:i|after:date_start',
         ]);
         $request->merge(['start' => $request->initperiod, 'end' => $request->endperiod, 'winner' => 0]);
         Period::create($request->only(['start', 'end', 'winner']));
