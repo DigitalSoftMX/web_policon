@@ -198,6 +198,8 @@ return [
         'abrev' => 'abreviación',
         'image_payment' => 'imagen',
         'station_id' => 'estación',
-        'extension' => 'El tipo de archivo'
+        'extension' => 'El tipo de archivo',
+        'date_start' => 'inicio de periodo',
+        'date_end' => 'término de periodo'
     ],
 ];

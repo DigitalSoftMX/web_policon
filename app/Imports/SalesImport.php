@@ -3,8 +3,8 @@
 namespace App\Imports;
 
 use App\Web\ExcelSale;
+use App\Web\Period;
 use DateTime;
-use Exception;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
 
@@ -23,18 +23,17 @@ class SalesImport implements ToCollection
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            try {
-                if (stristr($row[0], '0000000')) {
-                    if (is_int($row[4]) or is_double($row[4])) {
-                        $phpdate = ($row[4] - 25569) * 86400;
-                        $date = gmdate("Y-m-d H:i:s", $phpdate);
-                    } else {
-                        $date = new DateTime($row[4]);
-                        $date = $date->format('Y-m-d H:i:s');
-                    }
-                    $this->registerAnimasDorada($row, $date);
+            if (stristr($row[0], '0000000')) {
+                if (is_int($row[4]) or is_double($row[4])) {
+                    $phpdate = ($row[4] - 25569) * 86400;
+                    $date = gmdate("Y-m-d H:i:s", $phpdate);
+                } else {
+                    $date = new DateTime($row[4]);
+                    $date = $date->format('Y-m-d H:i:s');
                 }
-                /* switch ($this->station->number_station) {
+                $this->registerAnimasDorada($row, $date);
+            }
+            /* switch ($this->station->number_station) {
                     case 6532:
                         // Aldia Cholula
                         if (is_int($row[2])) {
@@ -92,25 +91,26 @@ class SalesImport implements ToCollection
                         }
                         break;
                 } */
-            } catch (Exception $e) {
-            }
         }
     }
     // Registrando informacion de la estacion Ánimas y Dorada
     private function registerAnimasDorada($row, $date)
     {
-        $saleBd = ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists();
-        if (!$saleBd) {
-            $sale = ExcelSale::create([
-                'station_id' => $this->station->id,
-                'ticket' => $row[0],
-                'date' => $date,
-                'product' => strtoupper($row[6]),
-                'liters' => $row[7],
-                'payment' => $row[9],
-            ]);
-            if ($sale->liters < 25 or $sale->product == 'DIESEL')
-                $sale->delete();
+        $period = Period::all()->last();
+        if ($period and !$period->finish) {
+            $saleBd = ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists();
+            if (!$saleBd) {
+                $sale = ExcelSale::create([
+                    'station_id' => $this->station->id,
+                    'ticket' => $row[0],
+                    'date' => $date,
+                    'product' => strtoupper($row[6]),
+                    'liters' => $row[7],
+                    'payment' => $row[9],
+                ]);
+                if ($sale->payment < 500 or $sale->product == 'DIESEL' or $sale->date < $period->date_start or $sale->date > $period->date_end)
+                    $sale->delete();
+            }
         }
     }
     // Regitrando informacion de la estacion Vanoe y Cholula

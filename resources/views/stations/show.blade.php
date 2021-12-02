@@ -11,7 +11,9 @@
                             <div class="col-md-6">
                                 <div class="statistics">
                                     <div class="card-body pt-0 pb-0 text-left">
-                                        <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Subir excel de ventas') }}
+                                        
+                                        <h6 class="card-subtitle mt-0 mb-0 text-muted">
+                                            {{ __('Subir excel de ventas') }}
                                         </h6>
                                         <form id="sales" action="{{ route('uploadexcelsales', $station) }}" method="post"
                                             enctype="multipart/form-data">
@@ -42,26 +44,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- <div class="col-md-3">
-                                <div class="statistics">
-                                    <div class="card-body pt-0 pb-0 text-left">
-                                        <h6 class="card-subtitle mt-0 mb-0 text-muted">
-                                            {{ __('total de vales entregados') }}</h6>
-                                        <h3 class="title mb-0">
-                                            {{ number_format($station->exchanges->where('status', 14)->count(), 0) }}</h3>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-                            {{-- <div class="col-md-3">
-                                <div class="statistics">
-                                    <div class="card-body pt-0 pb-0 text-left">
-                                        <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('litros vendidos') }}</h6>
-                                        <h3 class="title mb-0">{{ number_format($station_show['liters'], 2) }}</h3>
-                                    </div>
-                                </div>
-                            </div> --}}
 
                             <div class="col-md-6">
                                 <div class="">
@@ -245,18 +227,6 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div class="col-md-3">
-                            <div class="">
-                                    <div class=" card-body pt-0 pb-0 text-left">
-                                <h6 class="card-subtitle mt-0 mb-0 text-muted">Abonos pendientes</h6>
-                                <h3 class="title mt-0 mb-0">
-                                    {{ count($station->deposits->where('status', 1)) }}
-                                </h3>
-                                <a href="{{ route('balances.index', $station) }}" class="badge badge-success mt-0 mb-0">
-                                    Autorizar
-                                </a>
-                            </div>
-                        </div> --}}
                         </div>
                     </div>
 

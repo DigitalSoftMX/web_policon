@@ -3,10 +3,18 @@
 @section('content')
     <div class="row mb-2">
         <div class="col-3">
-            @if ($seeWinner)
-                <a href="{{ route('finishcompetition') }}" class="btn btn-danger">
-                    {{ __('Finalizar periodo') }}
-                </a>
+            @if ($seePeriod)
+                @isset($currentPeriod)
+                    <form class="form" id="finish" action="{{ route('periods.update', $currentPeriod) }}"
+                        method="POST">
+                        @method('put')
+                        @csrf
+                        <button type="button" class="btn btn-danger"
+                            onclick="confirm('¿Esta seguro que desea finalizar el periodo?')?document.getElementById('finish').submit() : '';">
+                            {{ __('Finalizar periodo') }}
+                        </button>
+                    </form>
+                @endisset
             @else
                 <button class="btn btn-dark" disabled>
                     {{ __('Finalizar periodo') }}
@@ -53,7 +61,7 @@
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
-                                        @foreach ($winners[$stations[0]->number_station]['clients'] as $client)
+                                        {{-- @foreach ($winners[$stations[0]->number_station]['clients'] as $client)
                                             <tr class="text-center">
                                                 <td>
                                                     {{ "{$client->user->name} {$client->user->first_surname} {$client->user->second_surname}" }}
@@ -63,7 +71,7 @@
                                                     {{ $client->puntos->where('station_id', $stations[0]->id)->first()->points }}
                                                 </td>
                                                 <td>
-                                                    @if ($seeWinner)
+                                                    @if ($currentPeriod->winner)
                                                         <a href="{{ route('clients.points', $client) }}"
                                                             class="btn btn-blue btn-sm">{{ __('Movimientos') }}
                                                         </a>
@@ -75,7 +83,7 @@
                                                                 <i class="fas fa-exclamation-circle"></i>
                                                             </a>
                                                         @else
-                                                            @if (!$seeWinner)
+                                                            @if (!$currentPeriod->winner)
                                                                 <button class="btn btn-blue btn-sm" disabled>
                                                                     {{ __('Ganador') }}
                                                                 </button>
@@ -92,7 +100,7 @@
                                                     @endif
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
@@ -117,7 +125,7 @@
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
-                                        @foreach ($winners[$stations[3]->number_station]['clients'] as $client)
+                                        {{-- @foreach ($winners[$stations[3]->number_station]['clients'] as $client)
                                             <tr class="text-center">
                                                 <td>
                                                     {{ "{$client->user->name} {$client->user->first_surname} {$client->user->second_surname}" }}
@@ -127,7 +135,7 @@
                                                     {{ $client->puntos->where('station_id', $stations[3]->id)->first()->points }}
                                                 </td>
                                                 <td>
-                                                    @if ($seeWinner)
+                                                    @if ($currentPeriod->winner)
                                                         <a href="{{ route('clients.points', $client) }}"
                                                             class="btn btn-blue btn-sm">{{ __('Movimientos') }}
                                                         </a>
@@ -139,7 +147,7 @@
                                                                 <i class="fas fa-exclamation-circle"></i>
                                                             </a>
                                                         @else
-                                                            @if (!$seeWinner)
+                                                            @if (!$currentPeriod->winner)
                                                                 <button class="btn btn-blue btn-sm" disabled>
                                                                     {{ __('Ganador') }}
                                                                 </button>
@@ -156,7 +164,7 @@
                                                     @endif
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
@@ -191,7 +199,7 @@
                                                     {{ $client->puntos->where('station_id', $stations[2]->id)->first()->points }}
                                                 </td>
                                                 <td>
-                                                    @if ($seeWinner)
+                                                    @if (!($currentPeriod->winner ?? true))
                                                         <a href="{{ route('clients.points', $client) }}"
                                                             class="btn btn-blue btn-sm">{{ __('Movimientos') }}
                                                         </a>
@@ -203,7 +211,8 @@
                                                                 <i class="fas fa-exclamation-circle"></i>
                                                             </a>
                                                         @else
-                                                            @if (!$seeWinner)
+                                                            {{ $currentPeriod->winner }}
+                                                            @if ($currentPeriod->winner ?? true)
                                                                 <button class="btn btn-blue btn-sm" disabled>
                                                                     {{ __('Ganador') }}
                                                                 </button>
@@ -245,7 +254,7 @@
                                         <th>{{ __('Acciones') }}</th>
                                     </thead>
                                     <tbody>
-                                        @foreach ($winners[$stations[1]->number_station]['clients'] as $client)
+                                        {{-- @foreach ($winners[$stations[1]->number_station]['clients'] as $client)
                                             <tr class="text-center">
                                                 <td>
                                                     {{ "{$client->user->name} {$client->user->first_surname} {$client->user->second_surname}" }}
@@ -255,7 +264,7 @@
                                                     {{ $client->puntos->where('station_id', $stations[1]->id)->first()->points }}
                                                 </td>
                                                 <td>
-                                                    @if ($seeWinner)
+                                                    @if ($currentPeriod->winner)
                                                         <a href="{{ route('clients.points', $client) }}"
                                                             class="btn btn-blue btn-sm">{{ __('Movimientos') }}
                                                         </a>
@@ -267,7 +276,7 @@
                                                                 <i class="fas fa-exclamation-circle"></i>
                                                             </a>
                                                         @else
-                                                            @if (!$seeWinner)
+                                                            @if (!$currentPeriod->winner)
                                                                 <button class="btn btn-blue btn-sm" disabled>
                                                                     {{ __('Ganador') }}
                                                                 </button>
@@ -284,7 +293,7 @@
                                                     @endif
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
