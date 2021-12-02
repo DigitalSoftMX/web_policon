@@ -38,8 +38,8 @@ class WinnerController extends Controller
                 }
             }
         }
-        $seeWinner = $period ? ($period->winner ? false : true) : false;
-        return view('winners.index', ['stations' => $stations, 'winners' => $winners, 'seeWinner' => $seeWinner, 'currentperiod' => $period]);
+        $seePeriod = $period ? ($period->finish ? false : true) : false;
+        return view('winners.index', ['stations' => $stations, 'winners' => $winners, 'seePeriod' => $seePeriod, 'currentPeriod' => $period]);
     }
 
     /**

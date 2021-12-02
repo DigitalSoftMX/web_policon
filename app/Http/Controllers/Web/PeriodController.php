@@ -22,9 +22,10 @@ class PeriodController extends Controller
         request()->validate([
             'date_start' =>  $lastperiod ? "required|date_format:Y-m-d H:i|after:{$lastperiod->date_end}" : 'required|date_format:Y-m-d H:i',
             'date_end' => 'required|date_format:Y-m-d H:i|after:date_start',
-        ]);
+        ]);       
         $request->merge(['start' => $request->initperiod, 'end' => $request->endperiod, 'winner' => 0]);
-        Period::create($request->only(['start', 'end', 'winner']));
+        
+        Period::create($request->only(['date_start', 'date_end']));
         return redirect()->back()->withStatus('Nuevo periodo de promocion iniciado');
     }
 
@@ -38,7 +39,7 @@ class PeriodController extends Controller
     public function update(Request $request, Period $period)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        $period->update(['winner' => 1]);
+        $period->update(['finish' => 1]);
         return redirect()->back()->withStatus('Se ha finalizado el concurso. Elija el ganador');
     }
 }

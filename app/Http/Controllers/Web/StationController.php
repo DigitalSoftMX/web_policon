@@ -214,65 +214,42 @@ class StationController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->withStatus('Algo salio mal, revise el formato excel para esta estación');
         }
-        $idsClientsAcepted = [];
-        $idsClientsDenied = [];
-        foreach (SalesQr::where([['active', 1], ['station_id', $station->id], ['status_id', 1]])->get() as $qr) {
+
+        $idsClientsAcepted = $idsClientVerify = $idsClientDenied = [];
+
+        foreach (SalesQr::where([['active', 1], ['station_id', $station->id], ['status_id', '!=', 2]])->get() as $qr) {
             if (ExcelSale::where([
                 ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
                 ['product', 'like', "{$qr->product}%"], ['liters', $qr->liters], ['payment', $qr->payment],
             ])->exists()) {
-                $count = SalesQr::where([['client_id', $qr->client_id], ['active', 1], ['status_id', 2], ['created_at', 'like', $qr->created_at->format('Y-m-d') . '%']])->count();
-                $continue = true;
-                switch ($qr->product) {
-                    case str_contains($qr->product, 'EXTRA'):
-                        $points = $this->getPoints($qr->liters, 1.5, $count);
-                        break;
-                    case str_contains($qr->product, 'SUPREME'):
-                        $points = $this->getPoints($qr->liters, 2, $count);
-                        break;
-                    default:
-                        $continue = false;
-                        break;
-                }
-                if ($continue) {
-                    $qr->update(['points' => $points, 'status_id' => 2]);
-                    $qr->client->points += $points;
-                    $qr->client->save();
-                    if ($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) {
-                        $poinstation->points += $points;
-                        $poinstation->save();
-                    } else {
-                        Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
-                    }
-                    if (!in_array($qr->client->ids, $idsClientsAcepted))
-                        array_push($idsClientsAcepted, $qr->client->ids);
+                $qr->update(['points' => 10, 'status_id' => 2]);
+                if ($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) {
+                    $poinstation->points += 10;
+                    $poinstation->save();
                 } else {
-                    if (!in_array($qr->client->ids, $idsClientsDenied))
-                        array_push($idsClientsDenied, $qr->client->ids);
+                    Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => 10]);
+                }
+                if (!in_array($qr->client->ids, $idsClientsAcepted)) array_push($idsClientsAcepted, $qr->client->ids);
+            } else {
+                if (ExcelSale::where([['ticket', $qr->sale], ['station_id', $station->id]])->exists()) {
+                    $qr->update(['status_id' => 4]);
+                    if (!in_array($qr->client->ids, $idsClientVerify)) array_push($idsClientVerify, $qr->client->ids);
+                } else {
                     $qr->update(['status_id' => 3]);
+                    if (!in_array($qr->client->ids, $idsClientDenied)) array_push($idsClientDenied, $qr->client->ids);
                 }
             }
         }
         $notify = new Activities();
         foreach ($idsClientsAcepted as $ids) {
-            $notify->sendNotification($ids, 'Sus puntos han sido sumados');
+            $notify->sendNotification($ids, 'Sus puntos han sido sumados.');
         }
-        foreach ($idsClientsDenied as $ids) {
-            $notify->sendNotification($ids, 'Sus puntos no pudieron sumarse, revise que los datos sean correctos');
+        foreach ($idsClientVerify as $ids) {
+            $notify->sendNotification($ids, 'Sus puntos no pudieron sumarse, revise que los datos sean correctos.');
         }
-        return redirect()->back()->withStatus('Ventas cargadas correctamente');
-    }
-    // Calcular numero de puntos
-    private function getPoints($liters, $sum, $count)
-    {
-        $val = $liters;
-        $liters = explode(".", $val);
-        if (count($liters) > 1) {
-            $points = $liters[0] . '.' . $liters[1][0];
-            $points = round($points, 0, PHP_ROUND_HALF_DOWN);
-        } else {
-            $points = intval($val);
+        foreach ($idsClientDenied as $ids) {
+            $notify->sendNotification($ids, 'Sus puntos no pudieron sumarse, el ticket no es válido.');
         }
-        return $points * ($sum + ($count * 0.25));
+        return redirect()->back()->withStatus('Ventas cargadas correctamente.');
     }
 }

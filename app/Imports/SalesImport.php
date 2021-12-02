@@ -3,8 +3,8 @@
 namespace App\Imports;
 
 use App\Web\ExcelSale;
+use App\Web\Period;
 use DateTime;
-use Exception;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
 
@@ -96,18 +96,21 @@ class SalesImport implements ToCollection
     // Registrando informacion de la estacion Ánimas y Dorada
     private function registerAnimasDorada($row, $date)
     {
-        $saleBd = ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists();
-        if (!$saleBd) {
-            $sale = ExcelSale::create([
-                'station_id' => $this->station->id,
-                'ticket' => $row[0],
-                'date' => $date,
-                'product' => strtoupper($row[6]),
-                'liters' => $row[7],
-                'payment' => $row[9],
-            ]);
-            if ($sale->liters < 25 or $sale->product == 'DIESEL')
-                $sale->delete();
+        $period = Period::all()->last();
+        if ($period and !$period->finish) {
+            $saleBd = ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists();
+            if (!$saleBd) {
+                $sale = ExcelSale::create([
+                    'station_id' => $this->station->id,
+                    'ticket' => $row[0],
+                    'date' => $date,
+                    'product' => strtoupper($row[6]),
+                    'liters' => $row[7],
+                    'payment' => $row[9],
+                ]);
+                if ($sale->payment < 500 or $sale->product == 'DIESEL' or $sale->date < $period->date_start or $sale->date > $period->date_end)
+                    $sale->delete();
+            }
         }
     }
     // Regitrando informacion de la estacion Vanoe y Cholula
