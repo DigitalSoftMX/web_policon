@@ -18,14 +18,16 @@ class PeriodController extends Controller
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
         $lastperiod = Period::all()->last();
-
+        $request->merge([
+            'date_start' => $request->date_start . ' ' . $request->hour_start,
+            'date_end' => "{$request->date_end} {$request->hour_end}"
+        ]);
         request()->validate([
             'date_start' =>  $lastperiod ? "required|date_format:Y-m-d H:i|after:{$lastperiod->date_end}" : 'required|date_format:Y-m-d H:i',
-            'date_end' => 'required|date_format:Y-m-d H:i|after:date_start',
-        ]);       
+            'date_end' => 'required|date_format:Y-m-d H:i|after:date_start', 'terms' => 'required|string'
+        ]);
         $request->merge(['start' => $request->initperiod, 'end' => $request->endperiod, 'winner' => 0]);
-        
-        Period::create($request->only(['date_start', 'date_end']));
+        Period::create($request->only(['date_start', 'date_end', 'terms']));
         return redirect()->back()->withStatus('Nuevo periodo de promocion iniciado');
     }
 
@@ -39,7 +41,9 @@ class PeriodController extends Controller
     public function update(Request $request, Period $period)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        $period->update(['finish' => 1]);
-        return redirect()->back()->withStatus('Se ha finalizado el concurso. Elija el ganador');
+        $request->conditions ? $period->update(['terms' => $request->conditions]) : $period->update(['finish' => 1]);
+        return $request->conditions ?
+            redirect()->back()->withStatus('Términos y condiciones actualizados correctamente') :
+            redirect()->back()->withStatus('Se ha finalizado el concurso. Elija el ganador');
     }
 }
