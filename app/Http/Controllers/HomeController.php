@@ -43,16 +43,16 @@ class HomeController extends Controller
         $sales = SalesQr::where('status_id', 2)->get();
         $currentPeriod = Period::all()->last();
         $litersInThisPeriod = $currentPeriod ?
-            $sales->where('created_at', '>=', $currentPeriod->start)->where('created_at', '<=', $currentPeriod->end)->sum('liters') :
+            $sales->where('created_at', '>=', $currentPeriod->date_start)->where('created_at', '<=', $currentPeriod->date_end)->sum('liters') :
             $sales->where('created_at', '>=', date('Y') . '-01-01')->where('created_at', '<=', date('Y') . '-12-31')->sum('liters');
-        $period = $currentPeriod ? "{$month->getNameMonthSpanish($currentPeriod->start)} - {$month->getNameMonthSpanish($currentPeriod->end)}" : 'Ene - Dic';
+        $period = $currentPeriod ? "{$month->getNameMonthSpanish($currentPeriod->date_start)} - {$month->getNameMonthSpanish($currentPeriod->date_end)}" : 'Ene - Dic';
         $clients = Client::all();
         return view('dashboard', [
             'totalclients' => $clients->count(), 'litersInThisPeriod' => number_format($litersInThisPeriod, 2),
             'tickets' => $sales->count(), 'totaliters' => number_format($sales->sum('liters'), 2),
             'clientsCurrentMonth' => $clients->where('created_at', 'like', '%' . date('Y-m') . '%')->count(),
             'period' => $period, 'currentperiod' => $currentPeriod,
-            'start' => $currentPeriod ? date("m-d-Y", strtotime($currentPeriod->end . "+ 1 day"))
+            'start' => $currentPeriod ? date("m-d-Y", strtotime($currentPeriod->date_end . "+ 1 day"))
                 : date('m-d-Y')
         ]);
     }
