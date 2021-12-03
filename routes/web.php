@@ -37,8 +37,6 @@ Route::group(['middleware' => 'auth'], function () {
 //rutas para los administradores
 Route::group(['middleware' => 'auth'], function () {
 	Route::resource('admins', 'Web\AdminController');
-	/* Route::get('company', 'Web\AdminController@editCompany')->name('company');
-	Route::patch('company/{company}', 'Web\AdminController@updateCompany')->name('company.update'); */
 	Route::post('admins/schedules', 'Web\AdminController@getSchedules')->name('admins.schedules');
 });
 
@@ -56,9 +54,7 @@ Route::group(['middleware' => 'auth'], function () {
 });
 // Rutas para los vales
 Route::group(['middleware' => 'auth'], function () {
-	// Route::resource('vouchers', 'Web\VoucherController', ['except' => ['show']]);
 	Route::resource('countvouchers', 'Web\CountVoucherController', ['except' => ['index', 'edit', 'update', 'show', 'destroy']]);
-	// Route::get('exchanges', 'Web\ExchangeController@index')->name('exchanges.index');
 	Route::post('exchanges/deliver/{exchange}', 'Web\ExchangeController@deliver')->name('exchange.deliver');
 	Route::post('exchanges/collect/{exchange}', 'Web\ExchangeController@collect')->name('exchange.collect');
 	Route::post('exchanges/history/{exchange}', 'Web\ExchangeController@history')->name('exchange.history');

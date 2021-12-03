@@ -208,16 +208,16 @@ class StationController extends Controller
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         request()->validate(['excel' => 'required|mimes:csv,xlsx,xls,ods']);
-        $file = $request->file('excel');
+
         try {
-            Excel::import(new SalesImport($station), $file);
+            Excel::import(new SalesImport($station), $request->file('excel'));
         } catch (Exception $e) {
             return redirect()->back()->withStatus('Algo salio mal, revise el formato excel para esta estación');
         }
 
         $idsClientsAcepted = $idsClientVerify = $idsClientDenied = [];
 
-        foreach (SalesQr::where([['active', 1], ['station_id', $station->id], ['status_id', '!=', 2]])->get() as $qr) {
+        foreach (SalesQr::where([['station_id', $station->id], ['status_id', '!=', 2]])->get() as $qr) {
             if (ExcelSale::where([
                 ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
                 ['product', 'like', "{$qr->product}%"], ['liters', $qr->liters], ['payment', $qr->payment],
@@ -232,11 +232,11 @@ class StationController extends Controller
                 if (!in_array($qr->client->ids, $idsClientsAcepted)) array_push($idsClientsAcepted, $qr->client->ids);
             } else {
                 if (ExcelSale::where([['ticket', $qr->sale], ['station_id', $station->id]])->exists()) {
+                    if (!in_array($qr->client->ids, $idsClientVerify) and $qr->status_id == 1) array_push($idsClientVerify, $qr->client->ids);
                     $qr->update(['status_id' => 4]);
-                    if (!in_array($qr->client->ids, $idsClientVerify)) array_push($idsClientVerify, $qr->client->ids);
                 } else {
+                    if (!in_array($qr->client->ids, $idsClientDenied) and $qr->status_id == 1) array_push($idsClientDenied, $qr->client->ids);
                     $qr->update(['status_id' => 3]);
-                    if (!in_array($qr->client->ids, $idsClientDenied)) array_push($idsClientDenied, $qr->client->ids);
                 }
             }
         }
