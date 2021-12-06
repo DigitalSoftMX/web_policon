@@ -19,16 +19,16 @@ class PeriodController extends Controller
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
         $lastperiod = Period::all()->last();
         $request->merge([
-            'date_start' => $request->date_start . ' ' . $request->hour_start,
+            'date_start' => "{$request->date_start} {$request->hour_start}",
             'date_end' => "{$request->date_end} {$request->hour_end}"
         ]);
         request()->validate([
+            'hour_start' => 'required|date_format:H:i', 'hour_end' => 'required|date_format:H:i',
             'date_start' =>  $lastperiod ? "required|date_format:Y-m-d H:i|after:{$lastperiod->date_end}" : 'required|date_format:Y-m-d H:i',
             'date_end' => 'required|date_format:Y-m-d H:i|after:date_start', 'terms' => 'required|string'
         ]);
-        $request->merge(['start' => $request->initperiod, 'end' => $request->endperiod, 'winner' => 0]);
         Period::create($request->only(['date_start', 'date_end', 'terms']));
-        return redirect()->back()->withStatus('Nuevo periodo de promocion iniciado');
+        return redirect()->back()->withStatus('Nuevo periodo de promoción iniciado');
     }
 
     /**

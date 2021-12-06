@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Period extends Model
 {
-    protected $fillable = ['date_start', 'hour_start', 'date_end', 'hour_end', 'winner', 'finish', 'terms'];
+    protected $fillable = ['date_start', 'date_end', 'winner', 'finish', 'terms'];
 }
