@@ -14,10 +14,45 @@
                                 onclick="confirm('¿Esta seguro que desea finalizar el periodo?')?document.getElementById('finish').submit() : '';">
                                 {{ __('Finalizar periodo') }}
                             </a>
+                            <a class="btn btn-info text-white" data-toggle="modal" data-target="#termsAndConditions">
+                                {{ __('Ver términos y condiciones') }}
+                            </a>
                         </form>
-                        <a class="btn btn-info text-white" data-toggle="modal" data-target="#termsAndConditions">
-                            {{ __('Ver términos y condiciones') }}
-                        </a>
+                        <div class="modal fade" id="termsAndConditions" tabindex="-1" role="dialog"
+                            aria-labelledby="termsAndConditionsLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title text-primary" id="termsAndConditionsLabel">
+                                            <strong>{{ __('Términos y Condiciones') }}</strong>
+                                        </h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form class="form" id="terminos"
+                                            action="{{ route('periods.update', $currentperiod) }}" method="POST">
+                                            @method('PUT')
+                                            @csrf
+                                            <div class="row justify-content-center">
+                                                <div class="form-group col-12">
+                                                    <textarea class="form-control" name="conditions" id="input-conditions"
+                                                        cols="50" rows="10"
+                                                        placeholder="Escribe los términos y condiciones">{{ old('conditions', $currentperiod->terms) }}</textarea>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-info"
+                                            onclick="confirm('Confirme la actualización de términos y condiciones')?document.getElementById('terminos').submit() : '';">
+                                            {{ __('Guardar') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     @else
                         <a class="btn btn-info text-white" data-toggle="modal" data-target="#period">
                             {{ __('Iniciar nuevo periodo') }}
@@ -41,7 +76,8 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <h5>{{ __('Una vez seleccinado el periodo los usuarios podrán comenzar a realizar la suma de sus puntos') }}
+                                <h5>
+                                    {{ __('Una vez seleccinado el periodo los usuarios podrán comenzar a realizar la suma de sus puntos') }}
                                 </h5>
                                 <form class="form" id="init" action="{{ route('periods.store') }}"
                                     method="POST">
@@ -51,43 +87,25 @@
                                             <label class="label-control">{{ __('Fecha de inicio') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-ini" name="date_start"
                                                 type="text" value="" placeholder="Fecha de inicio">
-                                            @if ($errors->has('date_start'))
-                                                <span id="date_start-error" class="error text-danger"
-                                                    for="input-date_start">
-                                                    {{ $errors->first('date_start') }}
-                                                </span>
-                                            @endif
+                                            @include('partials.error',[$name='date_start'])
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label class="label-control">{{ __('Fecha de término') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-end" name="date_end"
                                                 type="text" value="" placeholder="Fecha de término">
-                                            @if ($errors->has('date_end'))
-                                                <span id="date_end-error" class="error text-danger" for="input-date_end">
-                                                    {{ $errors->first('date_end') }}
-                                                </span>
-                                            @endif
+                                            @include('partials.error',[$name='date_end'])
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label class="label-control">{{ __('Hora de inicio') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-ini" name="hour_start"
                                                 type="time" value="" placeholder="Fecha de inicio">
-                                            @if ($errors->has('hour_start'))
-                                                <span id="hour_start-error" class="error text-danger"
-                                                    for="input-hour_start">
-                                                    {{ $errors->first('hour_start') }}
-                                                </span>
-                                            @endif
+                                            @include('partials.error',[$name='hour_start'])
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label class="label-control">{{ __('Hora de término') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-end" name="hour_end"
                                                 type="time" value="" placeholder="Fecha de término">
-                                            @if ($errors->has('hour_end'))
-                                                <span id="hour_end-error" class="error text-danger" for="input-hour_end">
-                                                    {{ $errors->first('hour_end') }}
-                                                </span>
-                                            @endif
+                                            @include('partials.error',[$name='hour_end'])
                                         </div>
                                     </div>
                                     <div class="row justify-content-center">
@@ -108,43 +126,6 @@
                         </div>
                     </div>
                 </div>
-                @isset($currentperiod)
-                    <div class="modal fade" id="termsAndConditions" tabindex="-1" role="dialog"
-                        aria-labelledby="termsAndConditionsLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title text-primary" id="termsAndConditionsLabel">
-                                        <strong>{{ __('Términos y Condiciones') }}</strong>
-                                    </h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <form class="form" id="terminos"
-                                        action="{{ route('periods.update', $currentperiod) }}" method="POST">
-                                        @method('PUT')
-                                        @csrf
-                                        <div class="row justify-content-center">
-                                            <div class="form-group col-12">
-                                                <textarea class="form-control" name="conditions" id="input-conditions"
-                                                    cols="50" rows="10"
-                                                    placeholder="Escribe los términos y condiciones">{{ old('conditions', $currentperiod->terms) }}</textarea>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-info"
-                                        onclick="confirm('Confirme la actualización de términos y condiciones')?document.getElementById('terminos').submit() : '';">
-                                        {{ __('Guardar') }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endisset
             </div>
         </div>
         <div class="tab-pane active" id="updates">
