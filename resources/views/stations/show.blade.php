@@ -11,7 +11,7 @@
                             <div class="col-md-6">
                                 <div class="statistics">
                                     <div class="card-body pt-0 pb-0 text-left">
-                                        
+
                                         <h6 class="card-subtitle mt-0 mb-0 text-muted">
                                             {{ __('Subir excel de ventas') }}
                                         </h6>
@@ -189,7 +189,7 @@
                                 <div class="statistics">
                                     <div class="card-body pt-0 pb-0 text-left">
                                         <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Ventas totales') }}</h6>
-                                        <h3 class="title mb-0">{{ count($station->sales) }}</h3>
+                                        <h3 class="title mb-0">{{ 0 }}</h3>
                                         @if ($sales > 0)
                                             <a class="text-success mt-0 mb-0">+{{ $sales }} %</a>
                                         @elseif($sales == 0)
@@ -206,7 +206,7 @@
                                     <div class="card-body pt-0 pb-0 text-left">
                                         <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Litros vendidos') }}</h6>
                                         <h3 class="title mb-0">
-                                            {{ $station->sales->where('liters', '>', 0)->sum('liters') }}</h3>
+                                            {{ 0 }}</h3>
                                         @if ($liters > 0)
                                             <a class="text-success mt-0 mb-0">
                                                 <i class="material-icons md-18">

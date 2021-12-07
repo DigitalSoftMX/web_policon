@@ -38,8 +38,7 @@ class WinnerController extends Controller
                 }
             }
         }
-        $seePeriod = $period ? ($period->finish ? false : true) : false;
-        return view('winners.index', ['stations' => $stations, 'winners' => $winners, 'seePeriod' => $seePeriod, 'currentPeriod' => $period]);
+        return view('winners.index', ['stations' => $stations, 'winners' => $winners, 'currentPeriod' => $period]);
     }
 
     /**
@@ -57,13 +56,13 @@ class WinnerController extends Controller
             Winner::create(['client_id' => $client->id, 'station_id' => $stationdb->id]);
         $client->winner = 1;
         $client->save();
+        Period::all()->last()->update(['winner' => 1]);
         $notify = new Activities();
         $notify->sendNotification(
             $client->ids,
             'Pronto recibirás una llamada de la estación para recibir más información.',
             '¡GANASTE!'
         );
-        // Enviar notificacion de ganador
         return redirect()->back()->withStatus("Se ha selecionado el ganador de la estación {$stationdb->name}");
     }
 }

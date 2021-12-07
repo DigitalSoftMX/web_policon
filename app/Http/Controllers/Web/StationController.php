@@ -100,8 +100,8 @@ class StationController extends Controller
         $mes_actual = date('m');
         $year = date('Y');
 
-        $lastMont = $station->sales()->where('created_at', 'like', '%' . $year . '-' . $mes_anterior . '%')->sum('liters');
-        $actualMont = $station->sales()->where('created_at', 'like', '%' . $year . '-' . $mes_actual . '%')->sum('liters');
+        $lastMont = 0;
+        $actualMont = 0;
 
         if ($lastMont > 0) {
             $liters = number_format((($actualMont / $lastMont) - 1) * 100, 2);
@@ -109,8 +109,8 @@ class StationController extends Controller
             $liters = $lastMont * 100;
         }
 
-        $lastMontSales = $station->sales()->where('created_at', 'like', '%' . $year . '-' . $mes_anterior . '%')->count();
-        $actualMontSales = $station->sales()->where('created_at', 'like', '%' . $year . '-' . $mes_actual . '%')->count();
+        $lastMontSales = 0;
+        $actualMontSales = 0;
 
         if ($lastMontSales > 0) {
             $sales = number_format((($actualMontSales / $lastMontSales) - 1) * 100, 2);

@@ -86,25 +86,27 @@
                                         <div class="form-group col-12 col-sm-6">
                                             <label class="label-control">{{ __('Fecha de inicio') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-ini" name="date_start"
-                                                type="text" value="" placeholder="Fecha de inicio">
+                                                type="text" value="" placeholder="Fecha de inicio" required>
                                             @include('partials.error',[$name='date_start'])
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label class="label-control">{{ __('Fecha de término') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-end" name="date_end"
-                                                type="text" value="" placeholder="Fecha de término">
+                                                type="text" value="" placeholder="Fecha de término" required>
                                             @include('partials.error',[$name='date_end'])
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label class="label-control">{{ __('Hora de inicio') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-ini" name="hour_start"
-                                                type="time" value="" placeholder="Fecha de inicio">
+                                                type="time" value="{{ old('hour_start', $hour) }}"
+                                                placeholder="Fecha de inicio" required>
                                             @include('partials.error',[$name='hour_start'])
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label class="label-control">{{ __('Hora de término') }}</label>
                                             <input class="form-control datetimepicker" id="input-date-end" name="hour_end"
-                                                type="time" value="" placeholder="Fecha de término">
+                                                type="time" value="{{ old('hour_end', $hour) }}"
+                                                placeholder="Fecha de término" required>
                                             @include('partials.error',[$name='hour_end'])
                                         </div>
                                     </div>
