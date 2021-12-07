@@ -35,7 +35,6 @@ class HomeController extends Controller
             $admin_station = AdminStation::where('user_id', $request->user()->id)->first();
             return redirect()->route('stations.show', ['station' => Station::find($admin_station->station_id), 'estacion_dashboard' => 'dashboard']);
         } else {
-
             // obteniendo ventas, ultimo periodo registrado y numero de clientes
             $month = new Activities();
             $sales = SalesQr::where('status_id', 2)->get();
@@ -45,13 +44,14 @@ class HomeController extends Controller
                 $sales->where('created_at', '>=', date('Y') . '-01-01')->where('created_at', '<=', date('Y') . '-12-31')->sum('liters');
             $period = $currentPeriod ? "{$month->getNameMonthSpanish($currentPeriod->date_start)} - {$month->getNameMonthSpanish($currentPeriod->date_end)}" : 'Ene - Dic';
             $clients = Client::all();
+
             return view('dashboard', [
                 'totalclients' => $clients->count(), 'litersInThisPeriod' => number_format($litersInThisPeriod, 2),
                 'tickets' => $sales->count(), 'totaliters' => number_format($sales->sum('liters'), 2),
                 'clientsCurrentMonth' => $clients->where('created_at', 'like', '%' . date('Y-m') . '%')->count(),
                 'period' => $period, 'currentperiod' => $currentPeriod,
-                'start' => $currentPeriod ? date("m-d-Y", strtotime($currentPeriod->date_end . "+ 1 day"))
-                    : date('m-d-Y')
+                'start' => $currentPeriod ? date("m-d-Y", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('m-d-Y'),
+                'hour' => $currentPeriod ? date("H:i", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('H:i'),
             ]);
         }
     }
