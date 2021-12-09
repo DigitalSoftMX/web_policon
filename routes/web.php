@@ -13,6 +13,7 @@ Route::get('/logout', function () {
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('/', 'HomeController@index')->name('home');
 	Route::resource('periods', 'Web\PeriodController', ['except' => ['index', 'create', 'edit', 'destroy']]);
+	Route::get('sales/{station?}', 'Web\ExcelController@index');
 	Route::get('litersMountYears', 'HomeController@litersMountYears')->name('litersMountYears');
 	Route::get('estacion/{id}', 'HomeController@show')->name('estacion');
 });

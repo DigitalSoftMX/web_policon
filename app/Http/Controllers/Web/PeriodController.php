@@ -7,6 +7,7 @@ use App\Point;
 use App\Repositories\Activities;
 use App\Web\Client;
 use App\Web\Period;
+use App\Web\Station;
 use Illuminate\Http\Request;
 
 class PeriodController extends Controller
@@ -31,8 +32,9 @@ class PeriodController extends Controller
             'date_end' => 'required|date_format:Y-m-d H:i|after:date_start', 'terms' => 'required|string'
         ]);
         Period::create($request->only(['date_start', 'date_end', 'terms']));
-        Point::where('points', '>', 0)->update(['points', 0]);
-        Client::where('active', 1)->update(['winner' => 0]);
+        Point::where('points', '>', 0)->update(['points' => 0]);
+        Client::where('winner', 1)->update(['winner' => 0]);
+        Station::where('winner', 1)->update(['winner' => 0]);
         return redirect()->back()->withStatus('Nuevo periodo de promoción iniciado');
     }
 
@@ -48,11 +50,8 @@ class PeriodController extends Controller
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
         $request->conditions ? $period->update(['terms' => $request->conditions]) : $period->update(['finish' => 1]);
         if ($period->finish) {
-            $idsClients = [];
-            foreach (Point::where('points', '>', 0)->get() as $point) {
-                if (!in_array($point->client->ids, $idsClients))
-                    array_push($idsClients, $point->client->ids);
-            }
+            $idsBd = Point::where('points', '>', 0)->with('client')->get()->pluck('client.ids')->toArray();
+            $idsClients = array_unique($idsBd);
             $notify = new Activities();
             foreach ($idsClients as $ids) {
                 $notify->sendNotification($ids, 'Gracias por participar: Mantente al pendiente de la app y nuestras redes sociales, pronto daremos a conocer a nuestros ganadores');

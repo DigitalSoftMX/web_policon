@@ -27,7 +27,7 @@
                                                 class="btn btn-blue btn-sm">{{ __('Movimientos') }}
                                             </a>
                                         @else
-                                            @if (!$currentPeriod->winner)
+                                            @if (!$currentPeriod->winner or !$station->winner)
                                                 <form
                                                     action="{{ route('selectwinner', [$client, $station->number_station]) }}"
                                                     method="post">

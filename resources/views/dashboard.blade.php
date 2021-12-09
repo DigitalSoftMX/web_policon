@@ -185,11 +185,85 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title ">{{ __('Registro de ventas excel de las estaciones') }}</h4>
+                    <p class="card-category">
+                        {{ __('Aquí puedes ver las ventas excel de las estaciones.') }}
+                    </p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group col-sm-3">
+                            <select id="input-station" name="station" class="selectpicker show-menu-arrow"
+                                data-style="btn-primary" data-width="100%">
+                                <option selected value="0">{{ __('Todas las estaciones') }}
+                                </option>
+                                @foreach ($stations as $station)
+                                    <option value="{{ $station->id }}">{{ $station->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table dataTable table-sm table-no-bordered table-hover white-datatables"
+                            cellspacing="0" width="100%" id="datatable_1">
+                            <thead class=" text-primary">
+                                <th>{{ __('Estación') }}</th>
+                                <th>{{ __('Ticket') }}</th>
+                                <th>{{ __('Producto') }}</th>
+                                <th>{{ __('Litros') }}</th>
+                                <th>{{ __('Pago') }}</th>
+                                <th>{{ __('Fecha') }}</th>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
     <script>
         init_calendar('input-date-ini', "{{ $start }}");
         init_calendar('input-date-end', "{{ $start }}");
+        
+        getExcelSales();
+        
+        $("#input-station").change(function() {
+            getExcelSales();
+        });
+
+        async function getExcelSales() {
+            try {
+                let station = document.getElementById('input-station').value;
+                station = station != 0 ? station : '';
+                const resp = await fetch(`{{ url('sales/${station}') }}`);
+                const data = await resp.json();
+                console.log(data);
+                destruir_table("datatable_1");
+                $('#datatable_1').find('tbody').empty();
+                data.sales.forEach(sale => {
+                    $("#datatable_1").find('tbody').append( /* html */ `
+                        <tr>
+                            <td>${sale.station.name}</td>
+                            <td>${sale.ticket}</td>
+                            <td>${sale.product}</td>
+                            <td>${Number(sale.liters).toFixed(2)} Lts</td>
+                            <td>$${Number(sale.payment).toFixed(2)}</td>
+                            <td>${sale.date}</td>
+                        </tr>
+                    `);
+                });
+                iniciar_date('datatable_1');
+            } catch (error) {
+                console.log(error);
+            }
+        }
     </script>
 @endpush
