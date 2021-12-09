@@ -9,7 +9,7 @@ class Station extends Model
 {
     protected $table = 'station';
 
-    protected $fillable = ['name', 'address', 'phone', 'email', 'number_station', 'active', 'image'];
+    protected $fillable = ['name', 'address', 'phone', 'email', 'number_station', 'active', 'image', 'winner'];
     // Relacion con las ventas por qr
     public function qrs()
     {
@@ -24,5 +24,10 @@ class Station extends Model
     public function winners()
     {
         return $this->hasMany(Winner::class);
+    }
+    // Relacion con las ventas excel
+    public function excelsales()
+    {
+        return $this->hasMany(ExcelSale::class);
     }
 }

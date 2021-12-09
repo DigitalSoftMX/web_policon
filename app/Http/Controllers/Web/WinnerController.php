@@ -57,6 +57,8 @@ class WinnerController extends Controller
         $client->winner = 1;
         $client->save();
         Period::all()->last()->update(['winner' => 1]);
+        $stationdb->update(['winner' => 1]);
+        $stationdb->excelsales()->delete();
         $notify = new Activities();
         $notify->sendNotification(
             $client->ids,

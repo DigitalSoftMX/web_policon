@@ -44,6 +44,7 @@ class HomeController extends Controller
                 $sales->where('created_at', '>=', date('Y') . '-01-01')->where('created_at', '<=', date('Y') . '-12-31')->sum('liters');
             $period = $currentPeriod ? "{$month->getNameMonthSpanish($currentPeriod->date_start)} - {$month->getNameMonthSpanish($currentPeriod->date_end)}" : 'Ene - Dic';
             $clients = Client::all();
+            $stations = Station::where('active', 1)->get();
 
             return view('dashboard', [
                 'totalclients' => $clients->count(), 'litersInThisPeriod' => number_format($litersInThisPeriod, 2),
@@ -52,6 +53,7 @@ class HomeController extends Controller
                 'period' => $period, 'currentperiod' => $currentPeriod,
                 'start' => $currentPeriod ? date("m-d-Y", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('m-d-Y'),
                 'hour' => $currentPeriod ? date("H:i", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('H:i'),
+                'stations' => $stations
             ]);
         }
     }
