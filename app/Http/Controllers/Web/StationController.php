@@ -222,12 +222,15 @@ class StationController extends Controller
                 ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
                 ['product', 'like', "{$qr->product}%"], ['liters', $qr->liters], ['payment', $qr->payment],
             ])->exists()) {
-                $qr->update(['points' => 10, 'status_id' => 2]);
+                $points = 10;
+                $division = intval($qr->payment / 500);
+                $points *= $division;
+                $qr->update(['points' => $points, 'status_id' => 2]);
                 if ($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) {
-                    $poinstation->points += 10;
+                    $poinstation->points += $points;
                     $poinstation->save();
                 } else {
-                    Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => 10]);
+                    Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
                 }
                 if (!in_array($qr->client->ids, $idsClientsAcepted)) array_push($idsClientsAcepted, $qr->client->ids);
             } else {

@@ -104,8 +104,8 @@
     <script>
         let station = "{{ $station ?? '' }}";
         $(document).ready(function() {
-            init_calendar('input-date-ini', '01-01-2018', '07-07-2025');
-            init_calendar('input-date-end', '01-01-2018', '07-07-2025');
+            init_calendar('input-date-ini', `{{ $start }}`, `{{ $end }}`);
+            init_calendar('input-date-end', `{{ $start }}`, `{{ $end }}`);
         });
         $("#btnHistory").click(function() {
             let data = {
