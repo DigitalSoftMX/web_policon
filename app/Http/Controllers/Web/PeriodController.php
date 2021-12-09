@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Point;
 use App\Repositories\Activities;
 use App\Web\Client;
+use App\Web\ExcelSale;
 use App\Web\Period;
 use App\Web\Station;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ class PeriodController extends Controller
         Point::where('points', '>', 0)->update(['points' => 0]);
         Client::where('winner', 1)->update(['winner' => 0]);
         Station::where('winner', 1)->update(['winner' => 0]);
+        ExcelSale::getQuery()->delete();
         return redirect()->back()->withStatus('Nuevo periodo de promoción iniciado');
     }
 

@@ -7,6 +7,7 @@ use App\Http\Requests\UserRequest;
 use App\Role;
 use App\User;
 use App\Web\AdminStation;
+use App\Web\Period;
 use App\Web\SalesQr;
 use App\Web\Station;
 use Illuminate\Http\Request;
@@ -209,33 +210,21 @@ class AdminController extends Controller
         $station = Station::find($request->station);
         return response()->json(['schedules' => $station->schedules, 'islands' => $station->islands]);
     }
-    // Metoodo para obtener la informacion de la empresa
-    /* public function editCompany(Request $request)
-    {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        return view('admins.company', ['company' => Empresa::find(1)]);
-    } */
-    // Metodo para actualizar la informacion de la empresa
-    /* public function updateCompany(CompanyRequest $request, Empresa $company)
-    {
-        $request->user()->authorizeRoles(['admin_master', 'admin_eucomb']);
-        if ($request->file('logo')) {
-            if (File::exists(public_path() . $company->imglogo)) {
-                File::delete(public_path() . $company->imglogo);
-            }
-            $logo = $request->file('logo')->store('public');
-            $request->merge(['imglogo' => Storage::url($logo)]);
-        }
-        $company->update($request->all());
-        return redirect()->back()->withStatus(__('Datos guardados correctamente'));
-    } */
     // Método para el historial de puntos y canjes
     public function history(Request $request)
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
-        return (auth()->user()->roles->first()->id == 3) ?
-            view('admins.history', ['station' => auth()->user()->admin->station_id]) :
-            view('admins.history');
+        if (($admin = auth()->user())->roles->first()->id == 3) {
+            $station = $admin->admin->station_id;
+            $period = Period::all()->last();
+            $start = date("Y-m-d", strtotime($period->date_start));
+            $end = date('Y-m-d', strtotime($period->date_end));
+            return view('admins.history', ['station' => $station, 'start' => $start, 'end' => $end]);
+        }
+        $period = Period::all()->first();
+        $start = date("Y-m-d", strtotime($period->date_start));
+        $end = now()->format('Y-m-d');
+        return view('admins.history', ['start' => $start, 'end' => $end]);
     }
     // Metodo para obtener el historial de puntos
     public function getPoints(Request $request)

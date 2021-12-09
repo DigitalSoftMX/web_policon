@@ -27,11 +27,11 @@ class WinnerController extends Controller
         foreach ($stations as $station) {
             $winners[$station->number_station] = ['clients' => []];
         }
-        if ($period) {
+        if ($period and $period->finish) {
             $idsClients = [];
             foreach (Point::where('points', '>', 0)->with(['client.user', 'station'])->orderBy('points', 'desc')->get() as $point) {
                 if (!in_array($point->client_id, $idsClients)) {
-                    if (count($winners[$point->station->number_station]['clients']) < 20) {
+                    if (count($winners[$point->station->number_station]['clients']) <= 20) {
                         array_push($winners[$point->station->number_station]['clients'], $point->client);
                         array_push($idsClients, $point->client_id);
                     }
