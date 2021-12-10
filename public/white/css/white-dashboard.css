@@ -752,8 +752,8 @@ pre code {
   position: relative;
   width: 100%;
   min-height: 1px;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 5px;
+  padding-left: 5px;
 }
 
 .col {
@@ -6691,7 +6691,7 @@ button.bg-warning:focus {
 }
 
 .bg-danger {
-  background-color: #DF0632 !important;
+  background-color: #D80F06 !important;
 }
 
 a.bg-danger:hover,

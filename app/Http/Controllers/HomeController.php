@@ -44,7 +44,39 @@ class HomeController extends Controller
                 $sales->where('created_at', '>=', date('Y') . '-01-01')->where('created_at', '<=', date('Y') . '-12-31')->sum('liters');
             $period = $currentPeriod ? "{$month->getNameMonthSpanish($currentPeriod->date_start)} - {$month->getNameMonthSpanish($currentPeriod->date_end)}" : 'Ene - Dic';
             $clients = Client::all();
-            $stations = Station::where('active', 1)->get();
+            $stations = Station::where('active', 1)->with('qrs')->get();
+            // Ventas totales por estacion
+            $totalSales = [];
+            foreach ($stations as $station) {
+                array_push($totalSales, [
+                    'station' => $station->name,
+                    'total' => $station->qrs->where('status_id', 2)->sum('liters'),
+                ]);
+            }
+            // Ventas totales por periodo por estacion
+            $periodSales = [];
+            foreach ($stations as $station) {
+                array_push($periodSales, [
+                    'station' => $station->name,
+                    'total' => $period ? $station->qrs()->where([
+                        ['created_at', '>=', $currentPeriod->date_start], ['created_at', '<=', $currentPeriod->date_end],
+                        ['status_id', 2]
+                    ])->sum('liters') : 0,
+                ]);
+            }
+
+            $totalPerDay = [];
+            $countdays = (strtotime($currentPeriod->date_end) - strtotime($currentPeriod->date_start)) / 86400;
+            $countdays = abs($countdays);
+            $countdays = floor($countdays);
+            $date = date("Y-m-d", strtotime($currentPeriod->date_start . "- 1 days"));
+            for ($i = 1; $i <= $countdays; $i++) {
+                $date = date("Y-m-d", strtotime($date . "+ 1 days"));
+                array_push($totalPerDay, [
+                    'day' => date("d", strtotime($date)),
+                    'total' => SalesQr::where('status_id', 2)->whereDate('created_at', $date)->sum('liters'),
+                ]);
+            }
 
             return view('dashboard', [
                 'totalclients' => $clients->count(), 'litersInThisPeriod' => number_format($litersInThisPeriod, 2),
@@ -53,7 +85,8 @@ class HomeController extends Controller
                 'period' => $period, 'currentperiod' => $currentPeriod,
                 'start' => $currentPeriod ? date("m-d-Y", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('m-d-Y'),
                 'hour' => $currentPeriod ? date("H:i", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('H:i'),
-                'stations' => $stations
+                'stations' => $stations, 'totalSales' => $totalSales, 'periodSales' => $periodSales,
+                'totalPerDay' => $totalPerDay
             ]);
         }
     }
