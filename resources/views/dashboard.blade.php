@@ -132,7 +132,7 @@
         </div>
         <div class="tab-pane active" id="updates">
             <div class="row">
-                <div class="col-sm-3">
+                <div class="col-md-3 col-sm-6">
                     <div class="card">
                         <div class="card-body text-left">
                             <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Usuarios registrados') }}</h6>
@@ -148,7 +148,7 @@
                     </div>
                 </div>
 
-                <div class="col-sm-3">
+                <div class="col-md-3 col-sm-6">
                     <div class="card">
                         <div class="card-body text-left">
                             <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Litros vendidos por periodo') }}</h6>
@@ -158,7 +158,7 @@
                     </div>
                 </div>
 
-                <div class="col-sm-3">
+                <div class="col-md-3 col-sm-6">
                     <div class="card">
                         <div class="card-body text-left">
                             <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('Tickets registrados') }}</h6>
@@ -170,7 +170,7 @@
                     </div>
                 </div>
 
-                <div class="col-sm-3">
+                <div class="col-md-3 col-sm-6">
                     <div class="card">
                         <div class="card-body text-left">
                             <h6 class="card-subtitle mt-0 mb-0 text-muted">{{ __('litros vendidos') }}</h6>
@@ -182,6 +182,139 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card overflowCards card-chart bg-danger">
+                <div class="card-header">
+                    <div class="row mt-1 mb-0">
+                        <div class="col-12 pt-2 text-left">
+                            <h4 class="card-subtitle text-white">VENTAS TOTALES POR ESTACIÓN</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height:44vh;">
+                        <canvas id="totalSales"></canvas>
+                    </div>
+                    @include('Graphics.dashboardGraphics',[$sales=$totalSales,$idChart='totalSales'])
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card overflowCards card-chart bg-primary">
+                <div class="card-header">
+                    <div class="row mt-1 mb-0">
+                        <div class="col-12 pt-2 text-left">
+                            <h4 class="card-subtitle text-white">VENTAS TOTALES POR PERIODO POR ESTACIÓN</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height:40vh;">
+                        <canvas id="periodSales"></canvas>
+                    </div>
+                    @include('Graphics.dashboardGraphics',[$sales=$periodSales,$idChart='periodSales'])
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height:55vh;">
+                <div class="card-header text-left m-0 p-0 pt-4 pl-5 pb-0">
+                    <h4 class="title text-primary font-weight-bold p-0 m-0 text-left">
+                        {{ __('INFORMACIÓN POR ESTACIÓN') }}
+                    </h4>
+                </div>
+                <div class="card-body text-left m-0 p-0 pt-3 pb-3">
+                    <div class="row m-0 pl-5 pr-5 pt-0 pb-0">
+                        <div class="table-full-width table-responsive col-sm-12 m-0 mr-0 ml-0 pr-0 pl-0">
+                            <table class="table table-shopping">
+                                <tbody>
+                                    @foreach ($stations as $estacion_1)
+                                        <tr>
+                                            <td>
+                                                <p class=" card-subtitle">{{ $estacion_1->name }}</p>
+                                            </td>
+                                            <td class="td-actions text-right">
+                                                <a class="btn btn-danger btn-link p-0 m-0" data-original-title=""
+                                                    href="{{ route('stations.show', $estacion_1) }}" rel="tooltip"
+                                                    title="Ver información de la estación">
+                                                    <i class="material-icons text-success">keyboard_arrow_right</i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card overflowCards card-chart">
+                <div class="card-header">
+                    <div class="row mt-1 mb-0">
+                        <div class="col-12 pt-2 text-left">
+                            <h4 class="card-subtitle">{{ __('VENTAS TOTALES POR DÍA') }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {{-- style="position: relative; height:44vh;" --}}
+                    <div class="chart-container" style="position: relative; height:44vh;">
+                        <canvas id="totalPerDay"></canvas>
+                    </div>
+                    @push('js')
+                        <script>
+                            var totalSales = @json($totalPerDay);
+                            var ctxL = document.getElementById("totalPerDay").getContext('2d');
+                            var gradientStroke = ctxL.createLinearGradient(0, 230, 0, 50);
+                            gradientStroke.addColorStop(1.0, 'rgba(14, 108, 196,0.2)');
+                            gradientStroke.addColorStop(0.5, 'rgba(14, 108, 196,0.05)');
+                            gradientStroke.addColorStop(0.0, 'rgba(14, 108, 196,0.0)');
+
+                            //purple colors
+                            var config = {
+                                type: 'bar',
+                                data: {
+                                    labels: [
+                                        @foreach ($totalPerDay as $day)
+                                            "{{ $day['day'] }}",
+                                        @endforeach
+                                    ],
+                                    datasets: [{
+                                        fill: true,
+                                        backgroundColor: gradientStroke,
+                                        borderColor: '#0E6CC4',
+                                        borderWidth: 1,
+                                        borderDash: [],
+                                        borderDashOffset: 0.0,
+                                        pointBackgroundColor: '#0E6CC4',
+                                        pointBorderColor: 'rgba(14,108,196,0)',
+                                        pointHoverBackgroundColor: '#FFFFFF',
+                                        pointBorderWidth: 15,
+                                        pointHoverRadius: 4,
+                                        pointHoverBorderWidth: 15,
+                                        pointRadius: 4,
+                                        data: [
+                                            @foreach ($totalPerDay as $total)
+                                                "{{ $total['total'] }}",
+                                            @endforeach
+                                        ]
+                                    }]
+                                },
+                                options: gradientChartOptionsConfigurationWithTooltipPurple,
+                            };
+
+                            var myChartDataL = new Chart(ctxL, config);
+                        </script>
+                    @endpush
+                </div>
             </div>
         </div>
     </div>
@@ -232,9 +365,9 @@
     <script>
         init_calendar('input-date-ini', "{{ $start }}");
         init_calendar('input-date-end', "{{ $start }}");
-        
+
         getExcelSales();
-        
+
         $("#input-station").change(function() {
             getExcelSales();
         });
