@@ -259,51 +259,65 @@
             <div class="card overflowCards card-chart">
                 <div class="card-header">
                     <div class="row mt-1 mb-0">
-                        <div class="col-12 pt-2 text-left">
+                        <div class="col-12 col-md-6 pt-2 text-left">
                             <h4 class="card-subtitle">{{ __('VENTAS TOTALES POR DÍA') }}</h4>
+                        </div>
+                        <div class="col-12 col-md-6 pt-2 text-center">
+                            <h4 style="float: left;" class="mx-1">
+                                <i class="fas fa-square-full text-primary"></i> {{ $months[0][1] }}
+                            </h4>
+                            <h4 style="float: left;" class="mx-1">
+                                <i class="fas fa-square-full text-danger"></i> {{ $months[1][1] }}
+                            </h4>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    {{-- style="position: relative; height:44vh;" --}}
-                    <div class="chart-container" style="position: relative; height:44vh;">
+                    <div class="chart-container" style="position: relative; height:60vh;">
                         <canvas id="totalPerDay"></canvas>
                     </div>
                     @push('js')
                         <script>
                             var totalSales = @json($totalPerDay);
                             var ctxL = document.getElementById("totalPerDay").getContext('2d');
-                            var gradientStroke = ctxL.createLinearGradient(0, 230, 0, 50);
-                            gradientStroke.addColorStop(1.0, 'rgba(14, 108, 196,0.2)');
-                            gradientStroke.addColorStop(0.5, 'rgba(14, 108, 196,0.05)');
-                            gradientStroke.addColorStop(0.0, 'rgba(14, 108, 196,0.0)');
+                            var red = ctxL.createLinearGradient(238, 3, 3, 50);
+                            red.addColorStop(1.0, 'rgba(238, 3, 3,1)');
+                            var blue = ctxL.createLinearGradient(28, 28, 205, 50);
+                            blue.addColorStop(1.0, 'rgba(28, 28, 205,1)');
 
                             //purple colors
                             var config = {
                                 type: 'bar',
                                 data: {
                                     labels: [
-                                        @foreach ($totalPerDay as $day)
-                                            "{{ $day['day'] }}",
+                                        @foreach ($totalPerDay['days'] as $day)
+                                            "{{ $day }}",
                                         @endforeach
                                     ],
                                     datasets: [{
+                                        label: "{{ $months[0][1] }}",
                                         fill: true,
-                                        backgroundColor: gradientStroke,
+                                        backgroundColor: blue,
                                         borderColor: '#0E6CC4',
                                         borderWidth: 1,
-                                        borderDash: [],
+                                        barPercentage: 0.5,
                                         borderDashOffset: 0.0,
-                                        pointBackgroundColor: '#0E6CC4',
-                                        pointBorderColor: 'rgba(14,108,196,0)',
-                                        pointHoverBackgroundColor: '#FFFFFF',
-                                        pointBorderWidth: 15,
-                                        pointHoverRadius: 4,
-                                        pointHoverBorderWidth: 15,
-                                        pointRadius: 4,
                                         data: [
-                                            @foreach ($totalPerDay as $total)
-                                                "{{ $total['total'] }}",
+                                            @foreach ($totalPerDay['salesFmonth'] as $total)
+                                                "{{ $total }}",
+                                            @endforeach
+                                        ]
+                                    }, {
+                                        label: "{{ $months[1][1] }}",
+                                        fill: true,
+                                        backgroundColor: red,
+                                        borderColor: '#F30F00',
+                                        borderWidth: 1,
+                                        barPercentage: 0.5,
+                                        borderDashOffset: 0.0,
+                                        data: [
+                                            @foreach ($totalPerDay['salesSmonth'] as $total)
+                                                "{{ $total }}",
                                             @endforeach
                                         ]
                                     }]
