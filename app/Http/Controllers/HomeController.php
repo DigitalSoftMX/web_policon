@@ -42,7 +42,8 @@ class HomeController extends Controller
             $litersInThisPeriod = $currentPeriod ?
                 $sales->where('created_at', '>=', $currentPeriod->date_start)->where('created_at', '<=', $currentPeriod->date_end)->sum('liters') :
                 $sales->where('created_at', '>=', date('Y') . '-01-01')->where('created_at', '<=', date('Y') . '-12-31')->sum('liters');
-            $period = $currentPeriod ? "{$month->getNameMonthSpanish($currentPeriod->date_start)} - {$month->getNameMonthSpanish($currentPeriod->date_end)}" : 'Ene - Dic';
+            $months = [$month->getNameMonthSpanish($currentPeriod->date_start), $month->getNameMonthSpanish($currentPeriod->date_end)];
+            $period = $currentPeriod ? "{$months[0][0]} - {$months[1][0]}" : 'Ene - Dic';
             $clients = Client::all();
             $stations = Station::where('active', 1)->with('qrs')->get();
             // Ventas totales por estacion
@@ -65,17 +66,27 @@ class HomeController extends Controller
                 ]);
             }
 
-            $totalPerDay = [];
-            $countdays = (strtotime($currentPeriod->date_end) - strtotime($currentPeriod->date_start)) / 86400;
-            $countdays = abs($countdays);
-            $countdays = floor($countdays);
-            $date = date("Y-m-d", strtotime($currentPeriod->date_start . "- 1 days"));
-            for ($i = 1; $i <= $countdays; $i++) {
-                $date = date("Y-m-d", strtotime($date . "+ 1 days"));
-                array_push($totalPerDay, [
-                    'day' => date("d", strtotime($date)),
-                    'total' => SalesQr::where('status_id', 2)->whereDate('created_at', $date)->sum('liters'),
-                ]);
+            /* $date = date("Y-m-d", strtotime($currentPeriod->date_start . "- 1 days"));
+            $date = date("Y-m-d", strtotime($date . "+ 1 days")); 
+            date("d", strtotime($date)),*/
+
+            $salesPerDay = [
+                'days' => [],
+                'salesFmonth' => [],
+                'salesSmonth' => [],
+            ];
+            $fmonth = date('Y-m', strtotime($currentPeriod->date_start));
+            $smonth = date('Y-m', strtotime($currentPeriod->date_end));
+            $lastDayOfFmonth = date('t', strtotime($currentPeriod->date_start));
+            $lastDayOfSmonth = date('t', strtotime($currentPeriod->date_end));
+            $lastDay = $lastDayOfFmonth > $lastDayOfSmonth ? $lastDayOfFmonth : $lastDayOfSmonth;
+            for ($i = 1; $i <= $lastDay; $i++) {
+                $day = $i < 10 ? "0{$i}" : "{$i}";
+                array_push($salesPerDay['days'], $day);
+                $liters = SalesQr::where('status_id', 2)->whereDate('created_at', "{$fmonth}-{$day}")->sum('liters');
+                array_push($salesPerDay['salesFmonth'], $liters);
+                $liters = SalesQr::where('status_id', 2)->whereDate('created_at', "{$smonth}-{$day}")->sum('liters');
+                array_push($salesPerDay['salesSmonth'], $liters);
             }
 
             return view('dashboard', [
@@ -86,7 +97,7 @@ class HomeController extends Controller
                 'start' => $currentPeriod ? date("m-d-Y", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('m-d-Y'),
                 'hour' => $currentPeriod ? date("H:i", strtotime($currentPeriod->date_end . "+ 1 minute")) : date('H:i'),
                 'stations' => $stations, 'totalSales' => $totalSales, 'periodSales' => $periodSales,
-                'totalPerDay' => $totalPerDay
+                'totalPerDay' => $salesPerDay, 'months' => $months
             ]);
         }
     }

@@ -43,9 +43,10 @@ class Activities
     {
         $date = date('m', strtotime($date));
         $months = [
-            '01' => 'Ene', '02' => 'Feb', '03' => 'Mar', '04' => 'Abr',
-            '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Ago',
-            '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Dic',
+            '01' => ['Ene', 'Enero'], '02' => ['Feb', 'Febrero'], '03' => ['Mar', 'Marzo'], '04' => ['Abr', 'Abril'],
+            '05' => ['May', 'Mayo'], '06' => ['Jun', 'Junio'], '07' => ['Jul', 'Julio'], '08' => ['Ago', 'Agosto'],
+            '09' => ['Sep', 'Septiembre'], '10' => ['Oct', 'Octubre'], '11' => ['Nov', 'Noviembre'],
+            '12' => ['Dic', 'Diciembre'],
         ];
         return $months[$date];
     }
