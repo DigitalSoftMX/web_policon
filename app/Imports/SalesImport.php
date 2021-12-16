@@ -40,7 +40,10 @@ class SalesImport implements ToCollection
                             'date' => $date, 'product' => strtoupper($row[6]),
                             'liters' => $row[7], 'payment' => $row[9],
                         ]);
-                        if ($sale->payment < 500 or $sale->product == 'DIESEL' or $sale->date < $this->period->date_start or $sale->date > $this->period->date_end)
+                        if (
+                            $sale->payment < 500 or $sale->product == 'DIESEL' or
+                            $sale->date < $this->period->date_start or $sale->date > $this->period->date_end
+                        )
                             $sale->delete();
                     }
                 }
