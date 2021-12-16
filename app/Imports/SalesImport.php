@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 class SalesImport implements ToCollection
 {
-    private $station, $period;
+    private $station, $period, $date;
     public function __construct($station)
     {
         $this->station = $station;
@@ -32,6 +32,7 @@ class SalesImport implements ToCollection
                     $date = new DateTime($row[4]);
                     $date = $date->format('Y-m-d H:i:s');
                 }
+                $this->date = $date;
                 if ($this->period and !$this->period->finish) {
                     $saleBd = ExcelSale::where([['station_id', $this->station->id], ['ticket', $row[0], ['date', $date]]])->exists();
                     if (!$saleBd) {
@@ -49,5 +50,12 @@ class SalesImport implements ToCollection
                 }
             }
         }
+    }
+    // Regresando la fecha
+    public function getDate()
+    {
+        $date = new DateTime($this->date);
+        $this->date = $date->format('Y-m-d');
+        return $this->date;
     }
 }
