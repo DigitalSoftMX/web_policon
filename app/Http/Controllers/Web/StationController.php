@@ -208,42 +208,53 @@ class StationController extends Controller
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         request()->validate(['excel' => 'required|mimes:csv,xlsx,xls,ods']);
-
         try {
             Excel::import(new SalesImport($station), $request->file('excel'));
         } catch (Exception $e) {
             return redirect()->back()->withStatus('Algo salio mal, revise el formato excel para esta estación');
         }
-
-        $idsClientsAcepted = $idsClientVerify = $idsClientDenied = [];
-
+        $idsClientsAcepted = [];
+        $idsClientVerify = [];
+        $idsClientDenied = [];
+        // return SalesQr::where([['station_id', $station->id], ['status_id', '!=', 2]])->get();
         foreach (SalesQr::where([['station_id', $station->id], ['status_id', '!=', 2]])->get() as $qr) {
-            if (ExcelSale::where([
-                ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
-                ['product', 'like', "{$qr->product}%"], ['liters', $qr->liters], ['payment', $qr->payment],
-            ])->exists()) {
-                $points = 10;
-                $division = intval($qr->payment / 500);
-                $points *= $division;
-                $qr->update(['points' => $points, 'status_id' => 2]);
-                if ($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) {
-                    $poinstation->points += $points;
-                    $poinstation->save();
+            if (stristr($qr->sale, '0000000')) {
+                /* $sale = ExcelSale::where([
+                    ['station_id', $station->id], ['ticket', $qr->sale],
+                ])->get();
+                if ($sale->count() > 0) return $sale; */
+                if (ExcelSale::where([
+                    ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
+                    ['product', 'like', "{$qr->product}%"], ['liters', $qr->liters], ['payment', $qr->payment],
+                ])->exists()) {
+                    // return $qr;
+                    $points = 10;
+                    $division = intval($qr->payment / 500);
+                    $points *= $division;
+                    $qr->update(['points' => $points, 'status_id' => 2]);
+                    if ($poinstation = $qr->client->puntos->where('station_id', $station->id)->first()) {
+                        $poinstation->points += $points;
+                        $poinstation->save();
+                    } else {
+                        Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
+                    }
+                    if (!in_array($qr->client->ids, $idsClientsAcepted)) array_push($idsClientsAcepted, $qr->client->ids);
                 } else {
-                    Point::create(['client_id' => $qr->client_id, 'station_id' => $station->id, 'points' => $points]);
-                }
-                if (!in_array($qr->client->ids, $idsClientsAcepted)) array_push($idsClientsAcepted, $qr->client->ids);
-            } else {
-                if (ExcelSale::where([['ticket', $qr->sale], ['station_id', $station->id]])->exists()) {
-                    if (!in_array($qr->client->ids, $idsClientVerify) and $qr->status_id == 1) array_push($idsClientVerify, $qr->client->ids);
-                    $qr->update(['status_id' => 4]);
-                } else {
-                    if (!in_array($qr->client->ids, $idsClientDenied) and $qr->status_id == 1) array_push($idsClientDenied, $qr->client->ids);
-                    $qr->update(['status_id' => 3]);
+                    if (ExcelSale::where([['ticket', $qr->sale], ['station_id', $station->id]])->exists()) {
+                        if (!in_array($qr->client->ids, $idsClientVerify) and $qr->status_id == 1)
+                            array_push($idsClientVerify, $qr->client->ids);
+                        $qr->update(['status_id' => 3]);
+                    } else {
+                        if (!in_array($qr->client->ids, $idsClientDenied) and $qr->status_id == 1)
+                            array_push($idsClientDenied, $qr->client->ids);
+                        $qr->update(['status_id' => 4]);
+                    }
                 }
             }
         }
-        $notify = new Activities();
+        /* echo 'fin';
+        dd(); */
+        /* $notify = new Activities();
         foreach ($idsClientsAcepted as $ids) {
             $notify->sendNotification($ids, 'Sus puntos han sido sumados.');
         }
@@ -252,7 +263,7 @@ class StationController extends Controller
         }
         foreach ($idsClientDenied as $ids) {
             $notify->sendNotification($ids, 'Sus puntos no pudieron sumarse, el ticket no es válido.');
-        }
+        } */
         return redirect()->back()->withStatus('Ventas cargadas correctamente.');
     }
 }
