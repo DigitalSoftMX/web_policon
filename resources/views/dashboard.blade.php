@@ -401,7 +401,7 @@
                             <td>${sale.station.name}</td>
                             <td>${sale.ticket}</td>
                             <td>${sale.product}</td>
-                            <td>${Number(sale.liters).toFixed(2)} Lts</td>
+                            <td>${Number(sale.liters).toFixed(3)} Lts</td>
                             <td>$${Number(sale.payment).toFixed(2)}</td>
                             <td>${sale.date}</td>
                         </tr>
