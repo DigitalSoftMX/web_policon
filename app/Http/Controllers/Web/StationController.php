@@ -208,15 +208,18 @@ class StationController extends Controller
     {
         $request->user()->authorizeRoles(['admin_master', 'admin_eucomb', 'admin_estacion']);
         request()->validate(['excel' => 'required|mimes:csv,xlsx,xls,ods']);
+        $date = null;
         try {
-            Excel::import(new SalesImport($station), $request->file('excel'));
+            Excel::import($sales = new SalesImport($station), $request->file('excel'));
+            $date = $sales->getDate();
         } catch (Exception $e) {
             return redirect()->back()->withStatus('Algo salio mal, revise el formato excel para esta estación');
         }
         $idsClientsAcepted = [];
         $idsClientVerify = [];
         $idsClientDenied = [];
-        foreach (SalesQr::where([['station_id', $station->id], ['status_id', '!=', 2]])->get() as $qr) {
+        foreach (SalesQr::where([['station_id', $station->id], ['status_id', '!=', 2]])
+            ->whereDate('created_at', $date)->get() as $qr) {
             if (stristr($qr->sale, '0000000')) {
                 $sale = ExcelSale::where([
                     ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
