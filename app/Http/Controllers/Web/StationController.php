@@ -216,18 +216,13 @@ class StationController extends Controller
         $idsClientsAcepted = [];
         $idsClientVerify = [];
         $idsClientDenied = [];
-        // return SalesQr::where([['station_id', $station->id], ['status_id', '!=', 2]])->get();
         foreach (SalesQr::where([['station_id', $station->id], ['status_id', '!=', 2]])->get() as $qr) {
             if (stristr($qr->sale, '0000000')) {
-                /* $sale = ExcelSale::where([
-                    ['station_id', $station->id], ['ticket', $qr->sale],
-                ])->get();
-                if ($sale->count() > 0) return $sale; */
-                if (ExcelSale::where([
+                $sale = ExcelSale::where([
                     ['station_id', $qr->station_id], ['ticket', $qr->sale], ['date', $qr->created_at->format('Y-m-d H:i:s')],
-                    ['product', 'like', "{$qr->product}%"], ['liters', $qr->liters], ['payment', $qr->payment],
-                ])->exists()) {
-                    // return $qr;
+                    ['liters', $qr->liters], ['payment', $qr->payment],
+                ])->get()->first();
+                if ($sale and (str_contains($qr->product, $sale->product) or str_contains($sale->product, $qr->product))) {
                     $points = 10;
                     $division = intval($qr->payment / 500);
                     $points *= $division;
@@ -250,10 +245,12 @@ class StationController extends Controller
                         $qr->update(['status_id' => 4]);
                     }
                 }
+            } else {
+                if (!in_array($qr->client->ids, $idsClientVerify) and $qr->status_id == 1)
+                    array_push($idsClientVerify, $qr->client->ids);
+                $qr->update(['status_id' => 3]);
             }
         }
-        /* echo 'fin';
-        dd(); */
         $notify = new Activities();
         foreach ($idsClientsAcepted as $ids) {
             $notify->sendNotification($ids, 'Sus puntos han sido sumados.');
