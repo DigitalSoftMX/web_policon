@@ -254,7 +254,7 @@ class StationController extends Controller
         }
         /* echo 'fin';
         dd(); */
-        /* $notify = new Activities();
+        $notify = new Activities();
         foreach ($idsClientsAcepted as $ids) {
             $notify->sendNotification($ids, 'Sus puntos han sido sumados.');
         }
@@ -263,7 +263,7 @@ class StationController extends Controller
         }
         foreach ($idsClientDenied as $ids) {
             $notify->sendNotification($ids, 'Sus puntos no pudieron sumarse, el ticket no es válido.');
-        } */
+        }
         return redirect()->back()->withStatus('Ventas cargadas correctamente.');
     }
 }
