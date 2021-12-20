@@ -30,13 +30,13 @@
             <div class="row">
                 <div class="form-group col-sm-2">
                     <label class="label-control">Fecha de inicio</label>
-                    <input class="form-control datetimepicker" id="input-date-ini" name="input-date-ini" type="text" value=""
-                        placeholder="Fecha">
+                    <input class="form-control datetimepicker" id="input-date-ini" name="input-date-ini" type="text"
+                        value="" placeholder="Fecha">
                 </div>
                 <div class="form-group col-sm-2">
                     <label class="label-control">Fecha de fin</label>
-                    <input class="form-control datetimepicker" id="input-date-end" name="input-date-end" type="text" value=""
-                        placeholder="Fecha">
+                    <input class="form-control datetimepicker" id="input-date-end" name="input-date-end" type="text"
+                        value="" placeholder="Fecha">
                 </div>
 
                 <input type="text" class="form-control d-none" id="input-client_id"
@@ -48,7 +48,7 @@
 
                 <div class="col text-right">
                     <h4 class="text-primary font-weight-bold">Puntos totales
-                        <p class="text-primary font-weight-bold h3">{{ $client->points }}</p>
+                        <p class="text-primary font-weight-bold h3">{{ $client->puntos->sum('points') }}</p>
                     </h4>
                 </div>
             </div>
@@ -58,7 +58,7 @@
     <div class="tab-content tab-space">
         <div class="tab-pane active" id="animas-1">
             @include('clients.tablepoints',[$stationame='animas'])
-        </div>       
+        </div>
         <div class="tab-pane" id="vanoe-1">
             @include('clients.tablepoints',[$stationame='vanoe'])
         </div>
@@ -71,8 +71,9 @@
         <div class="row">
             <div class="col-12 text-center">
                 <h4 class="card-title">
-                    <a class="btn btn-primary" href="{{ route('clients.index') }}" title="Regresar a la lista" class="h4">
-                        {{ __( 'Regresar' ) }}
+                    <a class="btn btn-primary" href="{{ route('clients.index') }}" title="Regresar a la lista"
+                        class="h4">
+                        {{ __('Regresar') }}
                     </a>
                 </h4>
             </div>
@@ -95,7 +96,7 @@
         // Ajax para el historial de puntos
         $("#points").click(function() {
             document.getElementById('points').disabled = true;
-            document.getElementById('points').innerHTML="Buscando...";
+            document.getElementById('points').innerHTML = "Buscando...";
             $.ajax({
                 url: "{{ route('history.points') }}",
                 type: 'GET',
@@ -120,8 +121,8 @@
                     demo.showNotification('top', 'center', error, 'tim-icons icon-bell-55');
                 },
                 complete: function(data) {
-                    document.getElementById('points').disabled = false;  
-                    document.getElementById('points').innerHTML="Buscar";
+                    document.getElementById('points').disabled = false;
+                    document.getElementById('points').innerHTML = "Buscar";
                 }
             });
         });
@@ -130,8 +131,16 @@
             destruir_table(name);
             $(`#${name}`).find('tbody').empty();
             response.pointsadded.forEach(point => {
-                let {sale, station, station_id, liters, points, concepto, date} = point;
-                if(station_id == id) {
+                let {
+                    sale,
+                    station,
+                    station_id,
+                    liters,
+                    points,
+                    concepto,
+                    date
+                } = point;
+                if (station_id == id) {
                     $(`#${name}`).find('tbody').append( /* html */
                         `<tr>
                             <td>${sale}</td>
