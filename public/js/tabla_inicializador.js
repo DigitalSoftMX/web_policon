@@ -3,14 +3,15 @@ function iniciar_date(nombre_tabla)
   table=$('#'+nombre_tabla).DataTable({
 
         responsive: true,
+        dom: 'Blfrtip',
         buttons: [
             {
                 extend: 'excelHtml5',
                 className: 'btn btn-sm btn-success',
                 exportOptions: {
                     columns: ':visible'
-                }
-            }
+                }               
+            },
         ],
         'pageLength': 10,
         'lengthMenu': [[10, 20, 25, 50, -1], [10, 20, 25, 50, 'Todos']],
