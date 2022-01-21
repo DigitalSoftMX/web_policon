@@ -380,7 +380,7 @@
         init_calendar('input-date-ini', "{{ $start }}");
         init_calendar('input-date-end', "{{ $start }}");
 
-        getExcelSales();
+        // getExcelSales();
 
         $("#input-station").change(function() {
             getExcelSales();
